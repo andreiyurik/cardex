@@ -1,0 +1,19 @@
+---
+import { useTranslations, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<footer class="border-base-300 space-y-2 border-t py-6">
+  <p class="text-base-content/60 max-w-prose text-xs leading-relaxed">
+    {t.footer.disclaimer}
+  </p>
+  <p class="text-base-content/40 text-xs">
+    {t.site.name} — {t.footer.madeFor}
+  </p>
+</footer>

@@ -1,10 +1,10 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import HomeContent from '../components/HomeContent.astro';
-import { medicalWebPage } from '../lib/seo/schema';
-import { useTranslations, localePath } from '../i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HomeContent from '../../components/HomeContent.astro';
+import { medicalWebPage } from '../../lib/seo/schema';
+import { useTranslations, localePath } from '../../i18n';
 
-const locale = 'ru' as const;
+const locale = 'en' as const;
 const t = useTranslations(locale);
 const url = new URL(localePath(locale, '/'), Astro.site!).href;
 

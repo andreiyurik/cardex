@@ -1,0 +1,43 @@
+---
+/**
+ * Shared shell: <head> with SEO, header, footer.
+ * Every page renders through this layout.
+ */
+import '../styles/global.css';
+import Seo from '../components/Seo.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import type { JsonLd } from '../lib/seo/schema';
+import type { Locale } from '../i18n';
+
+interface Props {
+  title: string;
+  description: string;
+  locale: Locale;
+  /** Locale-independent path of this page, e.g. "/calculators/syntax". */
+  path: string;
+  jsonLd?: JsonLd;
+}
+
+const { title, description, locale, path, jsonLd } = Astro.props;
+---
+
+<!doctype html>
+<html lang={locale} data-theme="cardex">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <Seo {title} {description} {locale} {path} {jsonLd} />
+  </head>
+  <body class="bg-base-100 text-base-content min-h-dvh font-sans antialiased">
+    <div class="mx-auto flex min-h-dvh max-w-5xl flex-col px-4">
+      <SiteHeader {locale} {path} />
+      <main class="flex-1 py-8">
+        <slot />
+      </main>
+      <SiteFooter {locale} />
+    </div>
+  </body>
+</html>

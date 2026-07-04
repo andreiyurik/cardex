@@ -1,46 +1,49 @@
-# Astro Starter Kit: Basics
+# Cardex
+
+Visual, interactive clinical calculators for interventional cardiology
+(endovascular surgery / РЭВХ). Russian-first UI, English secondary.
+Frontend-only: all calculations run in the browser — no patient data ever
+leaves the device.
+
+**Status: MVP in progress.** First calculator: SYNTAX Score.
+Clinical coefficients are placeholders pending physician verification —
+see `docs/roadmap.md`. **Not for clinical use yet.**
+
+## Stack
+
+Astro (SSG + islands) · Svelte 5 + TypeScript · Tailwind CSS 4 + DaisyUI ·
+Lucide icons · Cloudflare Pages · Vitest · Astro built-in i18n (ru/en).
+
+See `docs/architecture.md` and `docs/decisions.md` for the reasoning.
+
+## Local development
+
+Requires Node ≥ 22.12.
 
 ```sh
-npm create astro@latest -- --template basics
+npm install
+npm run dev        # dev server at http://localhost:4321
+npm test           # Vitest — clinical logic tests
+npm run build      # static build to ./dist
+npm run preview    # preview the production build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Deploy (Cloudflare Pages)
 
-## 🚀 Project Structure
+The site is a static build with the `@astrojs/cloudflare` adapter.
 
-Inside of your Astro project, you'll see the following folders and files:
+1. Push the repo to GitHub/GitLab.
+2. In the Cloudflare dashboard: **Workers & Pages → Create → Pages →
+   Connect to Git**, pick the repo.
+3. Build settings: framework preset **Astro**, build command
+   `npm run build`, output directory `dist`.
+4. Set the production domain, then update `site` in `astro.config.mjs`
+   so canonical URLs and the sitemap are correct.
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+Every push to `main` deploys automatically; PRs get preview deployments.
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Project docs
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- `docs/architecture.md` — layers, calculator pattern, data flow
+- `docs/decisions.md` — architecture decision records
+- `docs/roadmap.md` — phases + clinical verification TODOs

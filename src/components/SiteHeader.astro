@@ -1,0 +1,33 @@
+---
+import { Activity } from '@lucide/astro';
+import { useTranslations, localePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  /** Locale-independent path of the current page, used for the locale switch. */
+  path: string;
+}
+
+const { locale, path } = Astro.props;
+const t = useTranslations(locale);
+const otherLocale: Locale = locale === 'ru' ? 'en' : 'ru';
+---
+
+<header class="border-base-300 flex items-center justify-between border-b py-4">
+  <a href={localePath(locale, '/')} class="flex items-center gap-2">
+    <Activity class="text-primary size-6" aria-hidden="true" />
+    <span class="text-lg font-semibold tracking-tight">{t.site.name}</span>
+  </a>
+  <nav class="flex items-center gap-1">
+    <a href={localePath(locale, '/')} class="btn btn-ghost btn-sm">{t.nav.home}</a>
+    <a
+      href={localePath(locale, '/calculators/syntax')}
+      class="btn btn-ghost btn-sm">{t.nav.calculators}</a
+    >
+    <a
+      href={localePath(otherLocale, path)}
+      class="btn btn-outline btn-sm ml-2"
+      aria-label={t.nav.switchLocale}>{t.nav.switchLocale}</a
+    >
+  </nav>
+</header>
