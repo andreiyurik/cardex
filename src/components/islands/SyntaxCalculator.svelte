@@ -102,18 +102,18 @@
 <div class="grid gap-6 lg:grid-cols-[1fr_20rem]">
   <!-- Diagram -->
   <div class="bg-base-200 border-base-300 rounded-box border p-4">
-    <div class="mb-3 flex items-center justify-between gap-3">
-      <div class="join">
+    <div class="mb-3 space-y-2">
+      <div class="join grid grid-cols-2 sm:inline-flex">
         <button
-          class="btn btn-sm join-item {dominance === 'right' ? 'btn-primary' : 'btn-ghost'}"
+          class="btn join-item {dominance === 'right' ? 'btn-primary' : 'btn-ghost'}"
           onclick={() => (dominance = 'right')}>{ts.dominanceRight}</button
         >
         <button
-          class="btn btn-sm join-item {dominance === 'left' ? 'btn-primary' : 'btn-ghost'}"
+          class="btn join-item {dominance === 'left' ? 'btn-primary' : 'btn-ghost'}"
           onclick={() => (dominance = 'left')}>{ts.dominanceLeft}</button
         >
       </div>
-      <span class="text-base-content/50 text-xs">{ts.treeHint}</span>
+      <p class="text-base-content/50 text-xs">{ts.treeHint}</p>
     </div>
 
     <svg
@@ -135,12 +135,22 @@
           aria-pressed={isMarked}
           aria-label={ts.segments[seg.id]}
         >
+          <!-- Invisible fat hit area for comfortable thumb tapping on mobile. -->
           <line
             x1={seg.x1}
             y1={seg.y1}
             x2={seg.x2}
             y2={seg.y2}
-            stroke-width={isMarked ? 8 : 6}
+            stroke="transparent"
+            stroke-width="30"
+            stroke-linecap="round"
+          />
+          <line
+            x1={seg.x1}
+            y1={seg.y1}
+            x2={seg.x2}
+            y2={seg.y2}
+            stroke-width={isMarked ? 9 : 7}
             stroke-linecap="round"
             class={isMarked
               ? lesion?.totalOcclusion
@@ -151,7 +161,7 @@
           <circle
             cx={(seg.x1 + seg.x2) / 2}
             cy={(seg.y1 + seg.y2) / 2}
-            r="11"
+            r="13"
             class={isMarked ? 'fill-base-100' : 'fill-transparent'}
           />
           <text
@@ -159,7 +169,7 @@
             y={(seg.y1 + seg.y2) / 2}
             text-anchor="middle"
             dominant-baseline="central"
-            class="fill-base-content pointer-events-none text-[9px] font-semibold"
+            class="fill-base-content pointer-events-none text-[11px] font-semibold"
           >
             {seg.label}
           </text>
@@ -208,26 +218,26 @@
       {#if selectedList.length === 0}
         <p class="text-base-content/50 text-sm">{ts.noLesions}</p>
       {:else}
-        <ul class="space-y-2">
+        <ul class="divide-base-300/60 divide-y">
           {#each selectedList as lesion (lesion.segmentId)}
-            <li class="flex items-center justify-between gap-2 text-sm">
-              <span class="min-w-0 flex-1 truncate" title={ts.segments[lesion.segmentId]}>
-                {ts.segments[lesion.segmentId]}
-              </span>
-              <label class="flex shrink-0 items-center gap-1 text-xs">
+            <li class="flex flex-col gap-1.5 py-2 first:pt-0 last:pb-0">
+              <div class="flex items-center justify-between gap-2">
+                <span class="min-w-0 flex-1 text-sm">{ts.segments[lesion.segmentId]}</span>
+                <button
+                  class="btn btn-ghost btn-sm btn-square shrink-0"
+                  aria-label={ts.remove}
+                  onclick={() => toggleSegment(lesion.segmentId)}>✕</button
+                >
+              </div>
+              <label class="flex items-center gap-2 text-xs">
                 <input
                   type="checkbox"
-                  class="checkbox checkbox-xs checkbox-error"
+                  class="checkbox checkbox-sm checkbox-error"
                   checked={lesion.totalOcclusion}
                   onchange={() => toggleOcclusion(lesion.segmentId)}
                 />
                 {ts.totalOcclusion}
               </label>
-              <button
-                class="btn btn-ghost btn-xs"
-                aria-label={ts.remove}
-                onclick={() => toggleSegment(lesion.segmentId)}>✕</button
-              >
             </li>
           {/each}
         </ul>

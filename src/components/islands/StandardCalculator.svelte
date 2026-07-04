@@ -128,11 +128,11 @@
               type="number"
               inputmode="decimal"
               step={(f as NumberField).step ?? 'any'}
-              class="input input-bordered join-item w-full"
+              class="input input-bordered join-item w-full text-base"
               bind:value={state[f.id].value}
             />
             {#if f.units && f.units.length > 1}
-              <select class="select select-bordered join-item" bind:value={state[f.id].unit}>
+              <select class="select select-bordered join-item text-base" bind:value={state[f.id].unit}>
                 {#each f.units as u (u.id)}
                   <option value={u.id}>{unitLabel(u.id)}</option>
                 {/each}
@@ -142,7 +142,7 @@
             {/if}
           </div>
         {:else if f.kind === 'select'}
-          <select id={`f-${f.id}`} class="select select-bordered w-full" bind:value={state[f.id].value}>
+          <select id={`f-${f.id}`} class="select select-bordered w-full text-base" bind:value={state[f.id].value}>
             {#each f.options as o (o.id)}
               <option value={o.id}>{tc.options[o.id]}</option>
             {/each}

@@ -15,20 +15,21 @@ const otherLocale: Locale = locale === 'ru' ? 'en' : 'ru';
 const firstCalculator = `/calculators/${calculators[0].slug}`;
 ---
 
-<header class="border-base-300 flex items-center justify-between border-b py-4">
-  <a href={localePath(locale, '/')} class="flex items-center gap-2">
-    <Activity class="text-primary size-6" aria-hidden="true" />
-    <span class="text-lg font-semibold tracking-tight">{t.site.name}</span>
+<header
+  class="border-base-300 bg-base-100/85 sticky top-0 z-20 flex items-center justify-between gap-2 border-b py-3 backdrop-blur"
+>
+  <a href={localePath(locale, '/')} class="flex min-w-0 items-center gap-2">
+    <Activity class="text-primary size-6 shrink-0" aria-hidden="true" />
+    <span class="truncate text-lg font-semibold tracking-tight">{t.site.name}</span>
   </a>
-  <nav class="flex items-center gap-1">
-    <a href={localePath(locale, '/')} class="btn btn-ghost btn-sm">{t.nav.home}</a>
+  <nav class="flex shrink-0 items-center gap-1">
     <a
       href={localePath(locale, firstCalculator)}
       class="btn btn-ghost btn-sm">{t.nav.calculators}</a
     >
     <a
       href={localePath(otherLocale, path)}
-      class="btn btn-outline btn-sm ml-2"
+      class="btn btn-outline btn-sm"
       aria-label={t.nav.switchLocale}>{t.nav.switchLocale}</a
     >
   </nav>
