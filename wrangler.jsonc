@@ -3,6 +3,7 @@
 	"compatibility_date": "2026-07-04",
 	"compatibility_flags": ["global_fetch_strictly_public"],
 	"name": "cardex",
+	"account_id": "a2941664c53c5a00b368f440999f028e",
 	"main": "@astrojs/cloudflare/entrypoints/server",
 	"assets": {
 		"directory": "./dist",

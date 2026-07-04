@@ -1,8 +1,7 @@
 name: CI
 
+# Push to main is validated + deployed by deploy.yml; this runs on PRs.
 on:
-  push:
-    branches: [main]
   pull_request:
 
 jobs:
