@@ -61,6 +61,7 @@
   );
 
   const isDraft = syntaxDefinition.provenance.status === 'draft';
+  const hasPlaceholders = syntaxDefinition.goldenCases.some((c) => c.status === 'placeholder');
 
   $effect(() => {
     const params = new URLSearchParams();
@@ -198,8 +199,12 @@
 
     {#if isDraft}
       <div class="border-warning/40 bg-warning/10 text-warning rounded-box border p-3 text-xs">
-        <div class="mb-1 font-semibold">⚠ {t.calc.notForClinicalUse}</div>
-        <p class="text-warning/80 leading-snug">{t.calc.unverifiedNote}</p>
+        <div class="mb-1 font-semibold">
+          ⚠ {hasPlaceholders ? t.calc.notForClinicalUse : t.calc.onReview}
+        </div>
+        <p class="text-warning/80 leading-snug">
+          {hasPlaceholders ? t.calc.unverifiedNote : t.calc.draftNote}
+        </p>
       </div>
     {/if}
 

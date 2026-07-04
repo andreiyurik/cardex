@@ -17,6 +17,51 @@ export const en: Dictionary = {
       'verification. Not intended for clinical decision-making. ' +
       'All calculations run locally in your browser — no data is transmitted.',
     madeFor: 'Built for interventional cardiologists',
+    about: 'About',
+    legal: 'Disclaimer',
+    contact: 'Contact',
+  },
+  about: {
+    title: 'About',
+    lead:
+      'Cardex offers visual clinical calculators for interventional ' +
+      'cardiology — fast, clear, and grounded in sources.',
+    missionTitle: 'Mission',
+    mission:
+      'Make everyday scoring fast and legible right at the bedside. Everything ' +
+      'is computed locally in the browser — no patient data is transmitted or ' +
+      'stored, and the app works offline.',
+    methodTitle: 'How we ensure correctness',
+    method:
+      'All clinical logic lives in a single verifiable layer with cited ' +
+      'sources and is covered by golden-case tests. Formulas and thresholds ' +
+      'are verified by a practicing physician; each calculator shows its ' +
+      'verification status, version and sources.',
+    teamTitle: 'Team',
+    team:
+      'Built by an engineer together with a practicing interventional ' +
+      'cardiologist responsible for clinical correctness.',
+    statusNote:
+      'Some calculators are currently drafts: their coefficients await ' +
+      'physician verification and are labeled accordingly.',
+  },
+  disclaimer: {
+    title: 'Disclaimer',
+    p1:
+      'Cardex is an educational and supportive tool. It does not replace the ' +
+      'clinical judgment, diagnosis or treatment provided by a physician.',
+    p2:
+      'Use of this site does not create a doctor–patient relationship. ' +
+      'Responsibility for any clinical decision remains with the treating ' +
+      'physician.',
+    p3:
+      'Some calculators are under development: coefficients and thresholds may ' +
+      'be placeholders pending verification. Do not use them for clinical ' +
+      'decisions until they are marked "physician-verified".',
+    p4:
+      'Privacy: all calculations run locally in your browser. No patient data ' +
+      'is transmitted or stored on servers.',
+    p5: 'Found an error or inaccuracy? Let us know:',
   },
   home: {
     title: 'Visual clinical calculators',
@@ -38,6 +83,7 @@ export const en: Dictionary = {
     enterValues: 'Enter values',
     invalidInput: 'Check the entered values',
     notForClinicalUse: 'Not for clinical decisions',
+    onReview: 'Under clinical verification',
     provenanceTitle: 'Source & verification',
     sources: 'Sources',
     reviewedBy: 'Clinical review',
@@ -46,7 +92,10 @@ export const en: Dictionary = {
     statusVerified: 'Physician-verified',
     version: 'Version',
     unverifiedNote:
-      'Coefficients are placeholders pending verification by a practicing ' +
+      'The numbers in this calculator are placeholders pending verification ' +
+      'by a practicing physician. Do not use for clinical decisions.',
+    draftNote:
+      'Based on a published score but not yet signed off by a practicing ' +
       'physician. Do not use for clinical decisions.',
   },
   units: {

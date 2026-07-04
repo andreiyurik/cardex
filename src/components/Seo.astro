@@ -14,12 +14,26 @@ interface Props {
   path: string;
   jsonLd?: JsonLd;
   ogType?: string;
+  /** Site-relative OG image path (defaults to the shared social image). */
+  ogImage?: string;
+  /** Internal pages (e.g. /review): keep out of search + skip alternates. */
+  noindex?: boolean;
 }
 
-const { title, description, locale, path, jsonLd, ogType = 'website' } = Astro.props;
+const {
+  title,
+  description,
+  locale,
+  path,
+  jsonLd,
+  ogType = 'website',
+  ogImage = '/og.png',
+  noindex = false,
+} = Astro.props;
 
 const site = Astro.site!;
 const canonical = new URL(localePath(locale, path), site);
+const ogImageUrl = new URL(ogImage, site).href;
 const alternates = LOCALES.map((l) => ({
   locale: l,
   href: new URL(localePath(l, path), site).href,
@@ -29,14 +43,24 @@ const ogLocale = locale === 'ru' ? 'ru_RU' : 'en_US';
 
 <title>{title}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonical.href} />
 
-{alternates.map((a) => <link rel="alternate" hreflang={a.locale} href={a.href} />)}
-<link
-  rel="alternate"
-  hreflang="x-default"
-  href={new URL(localePath(DEFAULT_LOCALE, path), site).href}
-/>
+{
+  noindex ? (
+    <meta name="robots" content="noindex, nofollow" />
+  ) : (
+    <>
+      <link rel="canonical" href={canonical.href} />
+      {alternates.map((a) => (
+        <link rel="alternate" hreflang={a.locale} href={a.href} />
+      ))}
+      <link
+        rel="alternate"
+        hreflang="x-default"
+        href={new URL(localePath(DEFAULT_LOCALE, path), site).href}
+      />
+    </>
+  )
+}
 
 <meta property="og:type" content={ogType} />
 <meta property="og:title" content={title} />
@@ -44,8 +68,10 @@ const ogLocale = locale === 'ru' ? 'ru_RU' : 'en_US';
 <meta property="og:url" content={canonical.href} />
 <meta property="og:locale" content={ogLocale} />
 <meta property="og:site_name" content="Cardex" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content={ogImageUrl} />
+<meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
 
-{jsonLd && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />}
+{jsonLd && !noindex && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />}

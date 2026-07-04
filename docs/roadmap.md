@@ -47,6 +47,22 @@ Each is a `CalculatorDefinition` (standard tier). Clinical constants enter
 the codebase only from primary sources, verified by the physician
 co-founder, with golden cases from published references.
 
+## Launch readiness (pre-deploy polish)
+
+- [x] Clinical review worksheet (`/review`, noindex) — per-calculator
+      sources, thresholds, worked cases, placeholder flags, questions.
+- [x] Honest per-calculator banners: "числа-заглушки" vs "на верификации"
+      (data-driven from golden-case status).
+- [x] Branding: Cardex favicon + social/OG image (`/og.png`, in `<head>`).
+- [x] About + Disclaimer pages (ru/en) + contact (mailto) in footer.
+- [x] Custom 404, print styles, CI (astro check + vitest + build).
+- [ ] Set real production domain in `astro.config.mjs` `site`
+      (affects canonical / sitemap / OG URLs).
+- [ ] Set real contact email in `src/lib/site.ts` (`CONTACT_EMAIL`).
+- [ ] Privacy-first analytics (e.g. Cloudflare Web Analytics token).
+- [ ] Lighthouse pass (perf / a11y / SEO / best-practices).
+- [ ] v1.1: refine the SYNTAX coronary diagram visual (signature showcase).
+
 ## Phase 3 — Report generator
 
 - Structured PCI report/conclusion builder reusing calculator results

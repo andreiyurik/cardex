@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AboutContent from '../../components/AboutContent.astro';
+import { useTranslations } from '../../i18n';
+
+const locale = 'en' as const;
+const t = useTranslations(locale);
+---
+
+<BaseLayout title={`${t.about.title} | ${t.site.name}`} description={t.about.lead} locale={locale} path="/about">
+  <AboutContent locale={locale} />
+</BaseLayout>

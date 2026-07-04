@@ -19,7 +19,8 @@ export default defineConfig({
     },
   },
 
-  integrations: [svelte(), sitemap()],
+  // Keep the internal clinical-review page out of the public sitemap.
+  integrations: [svelte(), sitemap({ filter: (page) => !page.includes('/review') })],
 
   vite: {
     plugins: [tailwindcss()],

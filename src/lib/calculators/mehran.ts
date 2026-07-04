@@ -37,8 +37,8 @@ export interface MehranInput extends StandardInput {
   contrastVolume: number; // mL
 }
 
-/** TODO(clinical): verify weights. */
-const WEIGHTS = {
+/** TODO(clinical): verify weights. Exported so the /review page can display them. */
+export const WEIGHTS = {
   hypotension: 5,
   iabp: 5,
   chf: 5,

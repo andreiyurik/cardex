@@ -1,0 +1,227 @@
+---
+/**
+ * Internal clinical-review worksheet (Russian, noindex, excluded from
+ * sitemap/robots). One human-readable page for the physician co-founder to
+ * verify every calculator without reading TypeScript: sources, input
+ * schema, interpretation thresholds, worked reference cases, known
+ * placeholder numbers, and the specific questions to answer.
+ *
+ * This is an internal artifact, not a product page — Russian-only strings
+ * are intentional. All logic lives here in the frontmatter so the template
+ * stays free of TS generics / '<' (which the Astro parser mis-reads).
+ * When a calculator is signed off, set `provenance.reviewedBy` and flip
+ * `status` to 'physician-verified'.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ShieldAlert, ShieldCheck } from '@lucide/astro';
+import { calculators } from '../lib/calculators/registry';
+import { WEIGHTS as M } from '../lib/calculators/mehran';
+import { useTranslations } from '../i18n';
+import type { InputField, InterpretationBand } from '../lib/calculators/types';
+
+const t = useTranslations('ru');
+const dict = t.calculators as Record<string, any>;
+
+const QUESTIONS: Record<string, string[]> = {
+  syntax: [
+    'Веса сегментов — заглушки (все = 1). Указать реальные веса по официальному определению (Leaman) для правого и левого типа.',
+    'Множители поражений (×2 стеноз / ×5 окклюзия) — подтвердить.',
+    'Дополнительные характеристики (бифуркации, кальциноз, тортуозность, тромбоз, детали ХОКА) пока не учтены — решить, какие включать.',
+    'Пороги 22 / 33 и формулировки категорий — подтвердить.',
+  ],
+  'cha2ds2-vasc': [
+    'Таблица баллов каноническая. Подтвердить пороги назначения антикоагуляции (муж. ≥1/≥2, жен. ≥2/≥3) и формулировки категорий.',
+  ],
+  'has-bled': [
+    'Один балл за фактор — канонично. Подтвердить определения факторов (напр. неконтролируемая гипертензия САД > 160) и порог высокого риска ≥ 3.',
+  ],
+  grace: [
+    'Балльные таблицы (возраст, ЧСС, САД, креатинин, Killip и т.д.) — ЗАГЛУШКИ, не реальные значения GRACE. Прислать реальные значения GRACE / GRACE 2.0.',
+    'Пороги категорий риска — заглушки, требуют реальных значений.',
+  ],
+  mehran: [
+    'Веса факторов — сверить с первоисточником (Mehran 2004).',
+    'Пороги категорий (≤5 / 6–10 / 11–15 / ≥16) — подтвердить.',
+    '«1 балл на 100 мл контраста»: подтвердить способ округления.',
+  ],
+  'creatinine-clearance': [
+    'Формула Кокрофта–Голта стандартна — подтвердить транскрипцию и границы категорий рСКФ/клиренса.',
+  ],
+};
+
+function bandRange(min: number, max: number | null): string {
+  if (max === null) return `≥ ${min}`;
+  if (min === max) return `${min}`;
+  return `${min}–${max}`;
+}
+
+function fieldSummary(f: InputField, tc: any): string {
+  const label = tc.fields?.[f.id] ?? f.id;
+  if (f.kind === 'number') {
+    const hasRange = f.min != null || f.max != null;
+    const range = hasRange ? ` [${f.min ?? '−∞'}…${f.max ?? '+∞'}]` : '';
+    const units = f.units?.length ? ` (${f.units.map((u) => u.id).join(' / ')})` : '';
+    return `${label}: число${range}${units}`;
+  }
+  if (f.kind === 'select') {
+    return `${label}: выбор [${f.options.map((o) => tc.options?.[o.id] ?? o.id).join(', ')}]`;
+  }
+  return `${label}: да/нет`;
+}
+
+const mehranWeights =
+  `гипотензия ${M.hypotension}, ВАБК ${M.iabp}, ХСН ${M.chf}, возраст>75 ${M.ageOver75}, ` +
+  `анемия ${M.anemia}, диабет ${M.diabetes}, рСКФ 40-60/20-40/<20 = ` +
+  `${M.renal['egfr40-60']}/${M.renal['egfr20-40']}/${M.renal['egfr<20']}, ` +
+  `контраст ${M.contrastPer100ml}/100мл`;
+
+// Precompute a plain view model per calculator — no generics in the template.
+const rows = calculators.map((def) => {
+  const tc = dict[def.i18nKey];
+  return {
+    title: tc.title as string,
+    slug: def.slug,
+    version: def.version,
+    verified: def.provenance.status === 'physician-verified',
+    hasPlaceholders: def.goldenCases.some((c) => c.status === 'placeholder'),
+    sources: def.provenance.sources.map((c) => ({
+      text:
+        `${c.authors ? c.authors + '. ' : ''}${c.title}${c.journal ? '. ' + c.journal : ''} (${c.year})`,
+      href: c.doi ? `https://doi.org/${c.doi}` : (c.url ?? null),
+      label: c.doi ? `DOI:${c.doi}` : '↗',
+    })),
+    fields: (def.inputs ?? []).map((f) => fieldSummary(f, tc)),
+    signature: def.tier === 'signature',
+    bands: def.bands.map((b: InterpretationBand) => ({
+      range: bandRange(b.min, b.max),
+      label: (tc.bands?.[b.id]?.label as string) ?? b.id,
+    })),
+    golden: def.goldenCases.map((g) => ({
+      input: JSON.stringify(g.input),
+      result: `${g.expectedScore} · ${tc.bands?.[g.expectedBandId]?.label ?? g.expectedBandId}`,
+      verified: g.status === 'verified',
+    })),
+    weights: def.slug === 'mehran' ? mehranWeights : null,
+    questions: QUESTIONS[def.slug] ?? [],
+  };
+});
+---
+
+<BaseLayout
+  title="Лист клинической верификации | Cardex"
+  description="Внутренний лист проверки калькуляторов практикующим врачом."
+  locale="ru"
+  path="/review"
+  noindex={true}
+>
+  <div class="space-y-8">
+    <header class="space-y-2">
+      <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">
+        Лист клинической верификации
+      </h1>
+      <p class="text-base-content/70 max-w-2xl text-sm leading-relaxed">
+        Внутренняя страница для проверки клинической корректности калькуляторов.
+        По каждому: источник, поля ввода, пороги интерпретации, проверочные
+        примеры и вопросы к вам. Отметьте, что верно и что нужно исправить.
+        После вашей подписи мы проставим статус «верифицировано».
+      </p>
+      <p class="text-base-content/40 text-xs">
+        Страница закрыта от индексации и не входит в карту сайта.
+      </p>
+    </header>
+
+    {
+      rows.map((r) => (
+        <section class="border-base-300 bg-base-200 rounded-box space-y-4 border p-5">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="text-lg font-semibold">{r.title}</h2>
+            <span class="badge badge-sm badge-ghost font-mono">{r.slug}</span>
+            <span class="text-base-content/40 text-xs">v{r.version}</span>
+            <span class={`badge badge-sm ml-auto gap-1 ${r.verified ? 'badge-success' : 'badge-warning'}`}>
+              {r.verified ? <ShieldCheck class="size-3" /> : <ShieldAlert class="size-3" />}
+              {r.verified ? 'верифицировано' : 'черновик'}
+            </span>
+          </div>
+
+          {r.hasPlaceholders && (
+            <p class="border-error/40 bg-error/10 text-error rounded-box border p-2 text-xs font-medium">
+              ⚠ Числа в этом калькуляторе — ЗАГЛУШКИ (заполнены для механики).
+              Требуются реальные значения от вас.
+            </p>
+          )}
+
+          <div class="grid gap-4 text-sm md:grid-cols-2">
+            <div>
+              <h3 class="text-base-content/50 mb-1 text-xs uppercase tracking-wide">Источники</h3>
+              <ul class="space-y-1">
+                {r.sources.map((s) => (
+                  <li class="text-base-content/80 leading-snug">
+                    {s.text}
+                    {s.href && (
+                      <a href={s.href} target="_blank" rel="noopener noreferrer" class="text-primary ml-1 underline">
+                        {s.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="text-base-content/50 mb-1 text-xs uppercase tracking-wide">Поля ввода</h3>
+              <ul class="text-base-content/80 space-y-0.5">
+                {r.fields.map((f) => <li>{f}</li>)}
+                {r.signature && <li class="text-base-content/50">интерактивная схема (сегменты коронаров)</li>}
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="text-base-content/50 mb-1 text-xs uppercase tracking-wide">Категории (пороги)</h3>
+              <ul class="space-y-0.5">
+                {r.bands.map((b) => (
+                  <li>
+                    <span class="font-mono text-xs">{b.range}</span>
+                    {' — '}
+                    {b.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="text-base-content/50 mb-1 text-xs uppercase tracking-wide">Проверочные примеры</h3>
+              <ul class="space-y-1">
+                {r.golden.map((g) => (
+                  <li class="leading-snug">
+                    <code class="text-base-content/70 text-xs">{g.input}</code>
+                    <br />
+                    <span class="text-base-content/90">→ {g.result}</span>
+                    <span class={`ml-1 text-xs ${g.verified ? 'text-success' : 'text-warning'}`}>
+                      [{g.verified ? 'проверяемый' : 'заглушка'}]
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {r.weights && (
+            <div class="text-sm">
+              <h3 class="text-base-content/50 mb-1 text-xs uppercase tracking-wide">
+                Веса факторов (заглушки — проверить)
+              </h3>
+              <code class="text-base-content/70 text-xs">{r.weights}</code>
+            </div>
+          )}
+
+          <div>
+            <h3 class="text-base-content/50 mb-1 text-xs uppercase tracking-wide">Вопросы к врачу</h3>
+            <ol class="text-base-content/90 list-decimal space-y-1 pl-5 text-sm">
+              {r.questions.map((q) => <li>{q}</li>)}
+            </ol>
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>

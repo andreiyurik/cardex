@@ -85,6 +85,9 @@
   const bandSummary = $derived(band ? tc.bands[band.id]?.summary ?? '' : '');
 
   const isDraft = def.provenance.status === 'draft';
+  // Placeholder numbers (Mehran/GRACE) vs canonical-but-unsigned (CHA/HAS):
+  // a placeholder golden case means the coefficients themselves are not real.
+  const hasPlaceholders = def.goldenCases.some((c) => c.status === 'placeholder');
 
   // Sync state to the URL (shareable / bookmarkable).
   $effect(() => {
@@ -207,8 +210,12 @@
 
     {#if isDraft}
       <div class="border-warning/40 bg-warning/10 text-warning rounded-box border p-3 text-xs">
-        <div class="mb-1 font-semibold">⚠ {t.calc.notForClinicalUse}</div>
-        <p class="text-warning/80 leading-snug">{t.calc.unverifiedNote}</p>
+        <div class="mb-1 font-semibold">
+          ⚠ {hasPlaceholders ? t.calc.notForClinicalUse : t.calc.onReview}
+        </div>
+        <p class="text-warning/80 leading-snug">
+          {hasPlaceholders ? t.calc.unverifiedNote : t.calc.draftNote}
+        </p>
       </div>
     {/if}
 

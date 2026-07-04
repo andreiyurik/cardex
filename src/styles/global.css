@@ -59,3 +59,27 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Print: keep the calculator/result readable, drop site chrome. */
+@media print {
+  header,
+  footer,
+  nav,
+  .btn {
+    display: none !important;
+  }
+  :root {
+    color-scheme: light;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .rounded-box {
+    border-color: #ccc !important;
+    break-inside: avoid;
+  }
+}

@@ -1,5 +1,6 @@
 ---
-import { useTranslations, type Locale } from '../i18n';
+import { useTranslations, localePath, type Locale } from '../i18n';
+import { CONTACT_EMAIL } from '../lib/site';
 
 interface Props {
   locale: Locale;
@@ -9,7 +10,18 @@ const { locale } = Astro.props;
 const t = useTranslations(locale);
 ---
 
-<footer class="border-base-300 space-y-2 border-t py-6">
+<footer class="border-base-300 space-y-3 border-t py-6">
+  <nav class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+    <a href={localePath(locale, '/about')} class="text-base-content/70 hover:text-primary">
+      {t.footer.about}
+    </a>
+    <a href={localePath(locale, '/disclaimer')} class="text-base-content/70 hover:text-primary">
+      {t.footer.legal}
+    </a>
+    <a href={`mailto:${CONTACT_EMAIL}`} class="text-base-content/70 hover:text-primary">
+      {t.footer.contact}
+    </a>
+  </nav>
   <p class="text-base-content/60 max-w-prose text-xs leading-relaxed">
     {t.footer.disclaimer}
   </p>

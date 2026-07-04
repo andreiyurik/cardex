@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DisclaimerContent from '../../components/DisclaimerContent.astro';
+import { useTranslations } from '../../i18n';
+
+const locale = 'en' as const;
+const t = useTranslations(locale);
+---
+
+<BaseLayout title={`${t.disclaimer.title} | ${t.site.name}`} description={t.disclaimer.p1} locale={locale} path="/disclaimer">
+  <DisclaimerContent locale={locale} />
+</BaseLayout>

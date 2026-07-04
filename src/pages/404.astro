@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localePath } from '../i18n';
+
+// Single static 404 page (primary locale). Astro serves it as 404.html.
+const locale = 'ru' as const;
+---
+
+<BaseLayout
+  title="Страница не найдена | Cardex"
+  description="Страница не найдена."
+  locale={locale}
+  path="/404"
+  noindex={true}
+>
+  <section class="flex flex-col items-center justify-center gap-4 py-20 text-center">
+    <p class="text-primary text-6xl font-bold tabular-nums">404</p>
+    <h1 class="text-2xl font-semibold">Страница не найдена</h1>
+    <p class="text-base-content/60 max-w-md">
+      Возможно, ссылка устарела или введена с ошибкой.
+    </p>
+    <a href={localePath(locale, '/')} class="btn btn-primary mt-2">
+      На главную
+    </a>
+  </section>
+</BaseLayout>

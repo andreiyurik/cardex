@@ -17,9 +17,11 @@ interface Props {
   /** Locale-independent path of this page, e.g. "/calculators/syntax". */
   path: string;
   jsonLd?: JsonLd;
+  /** Internal pages kept out of search engines (e.g. /review). */
+  noindex?: boolean;
 }
 
-const { title, description, locale, path, jsonLd } = Astro.props;
+const { title, description, locale, path, jsonLd, noindex } = Astro.props;
 ---
 
 <!doctype html>
@@ -37,7 +39,7 @@ const { title, description, locale, path, jsonLd } = Astro.props;
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Cardex" />
 
-    <Seo {title} {description} {locale} {path} {jsonLd} />
+    <Seo {title} {description} {locale} {path} {jsonLd} {noindex} />
 
     {/* Register the service worker in production only (avoids stale caches in dev). */}
     <script is:inline>

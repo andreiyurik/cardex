@@ -1,0 +1,36 @@
+---
+import { useTranslations, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const a = t.about;
+---
+
+<article class="max-w-2xl space-y-6">
+  <header class="space-y-3">
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{a.title}</h1>
+    <p class="text-base-content/70 text-lg leading-relaxed">{a.lead}</p>
+  </header>
+
+  <section class="space-y-2">
+    <h2 class="text-xl font-semibold">{a.missionTitle}</h2>
+    <p class="text-base-content/70 leading-relaxed">{a.mission}</p>
+  </section>
+
+  <section class="space-y-2">
+    <h2 class="text-xl font-semibold">{a.methodTitle}</h2>
+    <p class="text-base-content/70 leading-relaxed">{a.method}</p>
+  </section>
+
+  <section class="space-y-2">
+    <h2 class="text-xl font-semibold">{a.teamTitle}</h2>
+    <p class="text-base-content/70 leading-relaxed">{a.team}</p>
+  </section>
+
+  <p class="border-warning/40 bg-warning/10 text-warning rounded-box border p-3 text-sm leading-snug">
+    {a.statusNote}
+  </p>
+</article>
