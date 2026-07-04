@@ -93,3 +93,103 @@ partnerships. UI text must not be hardcoded.
 **Consequences.** No extra dependency; per-locale static pages with
 correct `hreflang`. Content pages are duplicated per locale (acceptable
 at this scale; revisit with content collections if page count grows).
+
+## ADR-008: A calculator is a typed data object (registry + two tiers)
+
+**Context.** Writing each calculator as bespoke UI is expensive to
+generate, drifts visually, and scatters clinical data across components.
+
+**Decision.** Model every calculator as one `CalculatorDefinition` (pure
+`compute`, `bands`, `provenance`, optional declarative `inputs`, golden
+cases). A `registry` lists them; pages, the home catalog, the sitemap and
+tests derive from it. Two tiers: **standard** calculators are rendered by
+one generic form engine (`StandardCalculator.svelte`); **signature**
+calculators get a bespoke island (SYNTAX).
+
+**Consequences.** Adding a standard calculator = data only (no UI, no new
+page files) → cheap to generate, no drift. Design effort concentrates on
+a few signature calculators for differentiation. Slight indirection for
+the generic engine — accepted.
+
+## ADR-009: Provenance and verification are first-class
+
+**Context.** For a medical tool, trust (correct numbers, known sources,
+physician sign-off) matters more than features. It must be visible and
+auditable.
+
+**Decision.** Every definition carries `Provenance` (source citations with
+DOI, formula `version`, `status` draft/physician-verified, optional
+`reviewedBy`). Rendered server-side (`Provenance.astro`) for SEO and
+no-JS users, and emitted into schema.org `citation`.
+
+**Consequences.** The physician co-founder's sign-off becomes a visible
+product asset and audit record; unverified calculators are clearly
+flagged. Minor authoring overhead per calculator — the point of the tool.
+
+## ADR-010: Units and validation live in the input schema
+
+**Context.** Medical calculators fail on units (mg/dL vs µmol/L) and
+implausible inputs.
+
+**Decision.** `InputField` carries unit options (with canonical
+conversions) and physiologic ranges. The generic engine converts to
+canonical units and withholds a result for out-of-range/missing values —
+once, for all standard calculators.
+
+**Consequences.** Unit and range safety by construction, not re-coded per
+calculator. Hard range validation may occasionally be stricter than
+desired — revisit as soft warnings if needed.
+
+## ADR-011: Golden cases as verification data + regression tests
+
+**Context.** Clinical correctness is the core risk and needs a physician
+sign-off artifact.
+
+**Decision.** Attach `GoldenCase[]` (published reference results) to each
+definition; a generic harness runs them through `compute()`. `verified`
+cases are checkable sign-off; `placeholder` cases guard mechanics until
+constants are verified.
+
+**Consequences.** Verification and regression testing are the same
+artifact. Placeholder cases must be replaced with real ones as clinical
+values land (tracked in roadmap).
+
+## ADR-012: Registry-driven dynamic routes
+
+**Context.** Per-locale, per-calculator page files duplicate boilerplate
+and grow linearly.
+
+**Decision.** One dynamic route per locale
+(`calculators/[slug].astro`) enumerates the registry via
+`getStaticPaths`; SEO, schema.org and provenance derive from the
+definition.
+
+**Consequences.** Adding a calculator adds zero page files. Still fully
+static (prerendered per slug). Two route files (ru/en) remain to keep ru
+unprefixed under Astro i18n — acceptable.
+
+## ADR-013: Offline-first (PWA) over the static site
+
+**Context.** Clinicians often work without reliable signal (cath lab,
+bedside). The site is fully static, so offline is nearly free.
+
+**Decision.** A hand-written service worker (cache-first for hashed
+assets, network-first with cache fallback for navigations) + web
+manifest; registered in production only. No build-time precache manifest.
+
+**Consequences.** Works offline after first visit; a genuine bedside
+differentiator; survives content updates without a precache list. No
+heavy PWA plugin dependency. SW disabled on localhost to avoid stale dev
+caches.
+
+## ADR-014: URL-encoded calculator state
+
+**Context.** Sharing/bookmarking a filled calculation is useful and, for a
+frontend-only app, must not require a backend.
+
+**Decision.** Islands mirror input state to the URL query string and
+restore from it on load.
+
+**Consequences.** Shareable/bookmarkable calculations with zero backend;
+also lays groundwork for the future report generator. State shape is
+per-island (encoding owned by each island).

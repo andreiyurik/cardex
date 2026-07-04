@@ -1,6 +1,6 @@
 /**
- * Russian dictionary — primary locale.
- * The shape of this object is the canonical dictionary type (see index.ts).
+ * Russian dictionary — primary locale and the canonical dictionary shape.
+ * (en.ts is type-checked against a widened version of this object.)
  */
 export const ru = {
   site: {
@@ -26,6 +26,38 @@ export const ru = {
       'быстрые расчёты, визуализация, интерпретация по актуальным шкалам.',
     openCalculator: 'Открыть калькулятор',
     comingSoon: 'Скоро',
+    offlineReady: 'Работает офлайн',
+  },
+  // Shared calculator UI strings (used by every calculator island/page).
+  calc: {
+    result: 'Результат',
+    category: 'Категория',
+    explanation: 'Как получен результат',
+    formula: 'Формула',
+    reset: 'Сбросить',
+    share: 'Скопировать ссылку',
+    shared: 'Ссылка скопирована',
+    enterValues: 'Введите значения',
+    invalidInput: 'Проверьте введённые значения',
+    notForClinicalUse: 'Не для клинических решений',
+    provenanceTitle: 'Источник и верификация',
+    sources: 'Источники',
+    reviewedBy: 'Клиническая проверка',
+    notReviewed: 'Не верифицировано практикующим врачом',
+    statusDraft: 'Черновик — ожидает верификации врачом',
+    statusVerified: 'Верифицировано врачом',
+    version: 'Версия',
+    unverifiedNote:
+      'Коэффициенты — заглушки, ожидают верификации практикующим врачом. ' +
+      'Не использовать для клинических решений.',
+  },
+  // Unit display labels (keyed by the unit id used in calculator inputs).
+  units: {
+    'mg/dL': 'мг/дл',
+    'µmol/L': 'мкмоль/л',
+    kg: 'кг',
+    lb: 'фунт',
+    'ml/min': 'мл/мин',
   },
   calculators: {
     syntax: {
@@ -42,8 +74,75 @@ export const ru = {
         'артерий, используемая при выборе стратегии реваскуляризации ' +
         '(ЧКВ или АКШ). Отметьте поражённые сегменты на интерактивной схеме — ' +
         'балл и интерпретация рассчитываются автоматически.',
+      notes:
+        'Дополнительные характеристики поражений (бифуркации, кальциноз, ' +
+        'тортуозность, тромбоз, детали хронических окклюзий) пока не учтены.',
+      bands: {
+        low: {
+          label: 'Низкий (≤ 22)',
+          summary:
+            'Низкая анатомическая сложность. Обычно рассматривается ЧКВ.',
+        },
+        intermediate: {
+          label: 'Промежуточный (23–32)',
+          summary:
+            'Промежуточная сложность. Решение — консилиумом (Heart Team).',
+        },
+        high: {
+          label: 'Высокий (≥ 33)',
+          summary:
+            'Высокая сложность. Часто предпочтительно АКШ. Решение — Heart Team.',
+        },
+      },
+    },
+    creatinine: {
+      title: 'Клиренс креатинина (Cockcroft–Gault)',
+      shortDescription:
+        'Оценка клиренса креатинина для дозирования и оценки риска',
+      seoTitle: 'Клиренс креатинина Cockcroft–Gault — калькулятор | Cardex',
+      seoDescription:
+        'Калькулятор клиренса креатинина по формуле Кокрофта–Голта: возраст, ' +
+        'пол, масса тела и креатинин сыворотки. Переключение единиц ' +
+        '(мг/дл ↔ мкмоль/л, кг ↔ фунт).',
+      intro:
+        'Формула Кокрофта–Голта оценивает клиренс креатинина по возрасту, ' +
+        'полу, массе тела и уровню креатинина сыворотки. Используется для ' +
+        'коррекции доз и оценки риска контраст-индуцированной нефропатии.',
+      fields: {
+        age: 'Возраст (лет)',
+        sex: 'Пол',
+        weight: 'Масса тела',
+        creatinine: 'Креатинин сыворотки',
+      },
+      options: {
+        male: 'Мужской',
+        female: 'Женский',
+      },
+      bands: {
+        failure: {
+          label: 'Почечная недостаточность (< 15)',
+          summary: 'Тяжёлое снижение функции почек.',
+        },
+        severe: {
+          label: 'Тяжёлое снижение (15–29)',
+          summary: 'Выраженное снижение клиренса.',
+        },
+        moderate: {
+          label: 'Умеренное снижение (30–59)',
+          summary: 'Умеренное снижение функции почек.',
+        },
+        mild: {
+          label: 'Лёгкое снижение (60–89)',
+          summary: 'Незначительное снижение клиренса.',
+        },
+        normal: {
+          label: 'Норма (≥ 90)',
+          summary: 'Нормальная функция почек.',
+        },
+      },
     },
   },
+  // SYNTAX signature island — segment-specific strings.
   syntaxCalc: {
     dominance: 'Доминантность',
     dominanceRight: 'Правый тип',
@@ -53,18 +152,6 @@ export const ru = {
     noLesions: 'Сегменты не отмечены',
     totalOcclusion: 'Хроническая окклюзия',
     remove: 'Убрать',
-    reset: 'Сбросить',
-    score: 'SYNTAX Score',
-    risk: {
-      low: 'Низкий (≤ 22)',
-      intermediate: 'Промежуточный (23–32)',
-      high: 'Высокий (≥ 33)',
-    },
-    riskLabel: 'Категория',
-    unverifiedBadge: 'Коэффициенты не верифицированы',
-    unverifiedNote:
-      'Веса сегментов и множители — заглушки, ожидают верификации ' +
-      'практикующим врачом. Не использовать для клинических решений.',
     segments: {
       s1: 'ПКА проксимальный сегмент',
       s2: 'ПКА средний сегмент',

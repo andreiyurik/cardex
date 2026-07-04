@@ -1,0 +1,80 @@
+---
+/**
+ * Server-rendered provenance block: citations, version and verification
+ * status. Rendered statically (not in an island) so sources are visible
+ * to search engines and to users without JS — this is the trust layer.
+ */
+import { ShieldCheck, ShieldAlert } from '@lucide/astro';
+import type { Provenance } from '../lib/calculators/types';
+import { useTranslations, type Locale } from '../i18n';
+
+interface Props {
+  provenance: Provenance;
+  version: string;
+  locale: Locale;
+}
+
+const { provenance, version, locale } = Astro.props;
+const t = useTranslations(locale);
+const verified = provenance.status === 'physician-verified';
+---
+
+<section class="border-base-300 bg-base-200 rounded-box border p-5">
+  <div class="mb-3 flex items-center gap-2">
+    <h2 class="text-base font-semibold">{t.calc.provenanceTitle}</h2>
+    <span
+      class={`badge badge-sm gap-1 ${verified ? 'badge-success' : 'badge-warning'}`}
+    >
+      {verified ? <ShieldCheck class="size-3" /> : <ShieldAlert class="size-3" />}
+      {verified ? t.calc.statusVerified : t.calc.statusDraft}
+    </span>
+    <span class="text-base-content/40 ml-auto text-xs">{t.calc.version} {version}</span>
+  </div>
+
+  <dl class="space-y-3 text-sm">
+    <div>
+      <dt class="text-base-content/50 text-xs uppercase tracking-wide">
+        {t.calc.reviewedBy}
+      </dt>
+      <dd class="mt-0.5">
+        {
+          provenance.reviewedBy
+            ? `${provenance.reviewedBy.name} — ${provenance.reviewedBy.role} (${provenance.reviewedBy.date})`
+            : t.calc.notReviewed
+        }
+      </dd>
+    </div>
+
+    <div>
+      <dt class="text-base-content/50 text-xs uppercase tracking-wide">
+        {t.calc.sources}
+      </dt>
+      <dd class="mt-1">
+        <ul class="space-y-1">
+          {
+            provenance.sources.map((c) => {
+              const href = c.doi ? `https://doi.org/${c.doi}` : c.url;
+              return (
+                <li class="text-base-content/80 leading-snug">
+                  {c.authors ? `${c.authors} ` : ''}
+                  <span class="italic">{c.title}</span>
+                  {c.journal ? `. ${c.journal}` : ''} ({c.year})
+                  {href && (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-primary ml-1 underline underline-offset-2"
+                    >
+                      {c.doi ? `DOI:${c.doi}` : '↗'}
+                    </a>
+                  )}
+                </li>
+              );
+            })
+          }
+        </ul>
+      </dd>
+    </div>
+  </dl>
+</section>

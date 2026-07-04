@@ -25,6 +25,36 @@ export const en: Dictionary = {
       'visualization, and interpretation based on current risk scales.',
     openCalculator: 'Open calculator',
     comingSoon: 'Coming soon',
+    offlineReady: 'Works offline',
+  },
+  calc: {
+    result: 'Result',
+    category: 'Category',
+    explanation: 'How this was calculated',
+    formula: 'Formula',
+    reset: 'Reset',
+    share: 'Copy link',
+    shared: 'Link copied',
+    enterValues: 'Enter values',
+    invalidInput: 'Check the entered values',
+    notForClinicalUse: 'Not for clinical decisions',
+    provenanceTitle: 'Source & verification',
+    sources: 'Sources',
+    reviewedBy: 'Clinical review',
+    notReviewed: 'Not verified by a practicing physician',
+    statusDraft: 'Draft — pending physician verification',
+    statusVerified: 'Physician-verified',
+    version: 'Version',
+    unverifiedNote:
+      'Coefficients are placeholders pending verification by a practicing ' +
+      'physician. Do not use for clinical decisions.',
+  },
+  units: {
+    'mg/dL': 'mg/dL',
+    'µmol/L': 'µmol/L',
+    kg: 'kg',
+    lb: 'lb',
+    'ml/min': 'mL/min',
   },
   calculators: {
     syntax: {
@@ -41,6 +71,70 @@ export const en: Dictionary = {
         'artery disease and informs the choice of revascularization strategy ' +
         '(PCI vs CABG). Mark diseased segments on the interactive diagram — ' +
         'the score and interpretation update automatically.',
+      notes:
+        'Adverse lesion characteristics (bifurcation, calcification, ' +
+        'tortuosity, thrombus, chronic total occlusion details) are not yet ' +
+        'modeled.',
+      bands: {
+        low: {
+          label: 'Low (≤ 22)',
+          summary: 'Low anatomical complexity. PCI is usually considered.',
+        },
+        intermediate: {
+          label: 'Intermediate (23–32)',
+          summary: 'Intermediate complexity. Heart Team decision.',
+        },
+        high: {
+          label: 'High (≥ 33)',
+          summary: 'High complexity. CABG often preferred. Heart Team decision.',
+        },
+      },
+    },
+    creatinine: {
+      title: 'Creatinine clearance (Cockcroft–Gault)',
+      shortDescription:
+        'Estimated creatinine clearance for dosing and risk assessment',
+      seoTitle: 'Cockcroft–Gault Creatinine Clearance Calculator | Cardex',
+      seoDescription:
+        'Cockcroft–Gault creatinine clearance calculator: age, sex, body ' +
+        'weight and serum creatinine. Unit switching (mg/dL ↔ µmol/L, ' +
+        'kg ↔ lb).',
+      intro:
+        'The Cockcroft–Gault equation estimates creatinine clearance from ' +
+        'age, sex, body weight and serum creatinine. Used for dose ' +
+        'adjustment and contrast-induced nephropathy risk assessment.',
+      fields: {
+        age: 'Age (years)',
+        sex: 'Sex',
+        weight: 'Body weight',
+        creatinine: 'Serum creatinine',
+      },
+      options: {
+        male: 'Male',
+        female: 'Female',
+      },
+      bands: {
+        failure: {
+          label: 'Kidney failure (< 15)',
+          summary: 'Severe reduction in kidney function.',
+        },
+        severe: {
+          label: 'Severe reduction (15–29)',
+          summary: 'Markedly reduced clearance.',
+        },
+        moderate: {
+          label: 'Moderate reduction (30–59)',
+          summary: 'Moderately reduced kidney function.',
+        },
+        mild: {
+          label: 'Mild reduction (60–89)',
+          summary: 'Mildly reduced clearance.',
+        },
+        normal: {
+          label: 'Normal (≥ 90)',
+          summary: 'Normal kidney function.',
+        },
+      },
     },
   },
   syntaxCalc: {
@@ -52,18 +146,6 @@ export const en: Dictionary = {
     noLesions: 'No segments marked',
     totalOcclusion: 'Total occlusion',
     remove: 'Remove',
-    reset: 'Reset',
-    score: 'SYNTAX Score',
-    risk: {
-      low: 'Low (≤ 22)',
-      intermediate: 'Intermediate (23–32)',
-      high: 'High (≥ 33)',
-    },
-    riskLabel: 'Category',
-    unverifiedBadge: 'Coefficients not verified',
-    unverifiedNote:
-      'Segment weights and multipliers are placeholders pending verification ' +
-      'by a practicing physician. Do not use for clinical decisions.',
     segments: {
       s1: 'RCA proximal',
       s2: 'RCA mid',

@@ -1,5 +1,6 @@
 /**
  * SYNTAX Score — anatomical complexity of coronary artery disease.
+ * Signature-tier calculator (bespoke coronary-tree island).
  *
  * Single source of truth for the SYNTAX calculation. UI islands import
  * from here and NEVER duplicate formulas or thresholds.
@@ -13,9 +14,15 @@
  * (Sianos et al., EuroIntervention 2005; syntaxscore.org) before any
  * clinical use. Adverse lesion characteristics (bifurcation, tortuosity,
  * calcification, thrombus, CTO details, etc.) are NOT modeled yet —
- * see docs/roadmap.md "TODO(clinical)".
+ * see docs/roadmap.md "TODO(clinical)". Provenance.status is 'draft'.
  * ─────────────────────────────────────────────────────────────────────
  */
+import type {
+  CalcResult,
+  CalculatorDefinition,
+  InterpretationBand,
+  Provenance,
+} from './types';
 
 /** Coronary dominance determines which segments exist and their weights. */
 export type Dominance = 'right' | 'left';
@@ -100,6 +107,50 @@ export const DEFAULT_SCORING: ScoringConstants = {
   intermediateMax: 32,
 };
 
+/** Interpretation bands derived from the same thresholds as DEFAULT_SCORING. */
+export const SYNTAX_BANDS: InterpretationBand[] = [
+  {
+    id: 'low',
+    severity: 'low',
+    min: 0,
+    max: DEFAULT_SCORING.lowMax,
+    labelKey: 'low.label',
+    summaryKey: 'low.summary',
+  },
+  {
+    id: 'intermediate',
+    severity: 'moderate',
+    min: DEFAULT_SCORING.lowMax + 1,
+    max: DEFAULT_SCORING.intermediateMax,
+    labelKey: 'intermediate.label',
+    summaryKey: 'intermediate.summary',
+  },
+  {
+    id: 'high',
+    severity: 'high',
+    min: DEFAULT_SCORING.intermediateMax + 1,
+    max: null,
+    labelKey: 'high.label',
+    summaryKey: 'high.summary',
+  },
+];
+
+export const SYNTAX_PROVENANCE: Provenance = {
+  status: 'draft',
+  // TODO(clinical): confirm the canonical citation(s) with the physician.
+  sources: [
+    {
+      title:
+        'The SYNTAX Score: an angiographic tool grading the complexity of coronary artery disease',
+      authors: 'Sianos G, et al.',
+      journal: 'EuroIntervention',
+      year: 2005,
+      url: 'https://syntaxscore.org',
+    },
+  ],
+  notesKey: 'notes',
+};
+
 export interface LesionInput {
   segmentId: SegmentId;
   /** Chronic total occlusion (100%); otherwise significant stenosis. */
@@ -120,10 +171,9 @@ export interface LesionScore {
   points: number;
 }
 
-export interface SyntaxResult {
-  score: number;
+export interface SyntaxResult extends CalcResult {
+  /** Convenience alias of bandId (kept for readability at call sites). */
   risk: RiskCategory;
-  /** Per-lesion breakdown for UI display. */
   lesions: LesionScore[];
 }
 
@@ -188,5 +238,56 @@ export function calculateSyntaxScore(
   });
 
   const score = lesions.reduce((sum, l) => sum + l.points, 0);
-  return { score, risk: interpretScore(score, scoring), lesions };
+  const risk = interpretScore(score, scoring);
+  return {
+    score,
+    bandId: risk,
+    risk,
+    lesions,
+    contributions: lesions.map((l) => ({
+      label: l.segmentId,
+      value: l.points,
+      detail: `${l.weight} × ${l.multiplier}`,
+    })),
+  };
 }
+
+export const syntaxDefinition: CalculatorDefinition<SyntaxInput, SyntaxResult> = {
+  slug: 'syntax',
+  version: '0.1.0-draft',
+  tier: 'signature',
+  i18nKey: 'syntax',
+  estimatesRiskOf: 'Coronary artery disease',
+  bands: SYNTAX_BANDS,
+  provenance: SYNTAX_PROVENANCE,
+  defaultInput: { dominance: 'right', lesions: [] },
+  compute: (input) => calculateSyntaxScore(input),
+  // TODO(clinical): replace with real published reference cases once the
+  // segment weights are verified. These guard the placeholder mechanics only.
+  goldenCases: [
+    {
+      id: 'no-lesions',
+      input: { dominance: 'right', lesions: [] },
+      expectedScore: 0,
+      expectedBandId: 'low',
+      status: 'placeholder',
+      source: 'mechanics regression (placeholder weights = 1)',
+    },
+    {
+      id: 'single-stenosis-lad-prox',
+      input: { dominance: 'right', lesions: [{ segmentId: 's6', totalOcclusion: false }] },
+      expectedScore: 2,
+      expectedBandId: 'low',
+      status: 'placeholder',
+      source: 'mechanics regression (placeholder weights = 1)',
+    },
+    {
+      id: 'single-cto-rca-prox',
+      input: { dominance: 'right', lesions: [{ segmentId: 's1', totalOcclusion: true }] },
+      expectedScore: 5,
+      expectedBandId: 'low',
+      status: 'placeholder',
+      source: 'mechanics regression (placeholder weights = 1)',
+    },
+  ],
+};

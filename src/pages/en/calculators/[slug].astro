@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import CalculatorHost from '../../../components/CalculatorHost.astro';
+import Provenance from '../../../components/Provenance.astro';
+import { calculators, getCalculator } from '../../../lib/calculators/registry';
+import { medicalRiskCalculator } from '../../../lib/seo/schema';
+import { useTranslations, localePath } from '../../../i18n';
+
+export function getStaticPaths() {
+  return calculators.map((c) => ({ params: { slug: c.slug } }));
+}
+
+const locale = 'en' as const;
+const { slug } = Astro.params;
+const def = getCalculator(slug!);
+const t = useTranslations(locale);
+const tc = (t.calculators as Record<string, any>)[def.i18nKey];
+const path = `/calculators/${def.slug}`;
+const url = new URL(localePath(locale, path), Astro.site!).href;
+
+const jsonLd = medicalRiskCalculator({
+  url,
+  name: tc.title,
+  description: tc.seoDescription,
+  inLanguage: locale,
+  estimatesRiskOf: def.estimatesRiskOf,
+  citations: def.provenance.sources,
+  version: def.version,
+  lastReviewed: def.provenance.reviewedBy?.date,
+});
+---
+
+<BaseLayout
+  title={tc.seoTitle}
+  description={tc.seoDescription}
+  locale={locale}
+  path={path}
+  jsonLd={jsonLd}
+>
+  <article class="space-y-6">
+    <header class="space-y-3">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{tc.title}</h1>
+      <p class="text-base-content/70 max-w-2xl leading-relaxed">{tc.intro}</p>
+    </header>
+
+    <CalculatorHost slug={def.slug} tier={def.tier} locale={locale} />
+
+    <Provenance provenance={def.provenance} version={def.version} locale={locale} />
+  </article>
+</BaseLayout>

@@ -1,0 +1,26 @@
+---
+/**
+ * Dispatches to the right island for a calculator: signature-tier
+ * calculators have bespoke islands (mapped by slug); standard-tier
+ * calculators all share the generic StandardCalculator engine.
+ */
+import StandardCalculator from './islands/StandardCalculator.svelte';
+import SyntaxCalculator from './islands/SyntaxCalculator.svelte';
+import type { Locale } from '../i18n';
+
+interface Props {
+  slug: string;
+  tier: 'standard' | 'signature';
+  locale: Locale;
+}
+
+const { slug, tier, locale } = Astro.props;
+---
+
+{
+  slug === 'syntax' ? (
+    <SyntaxCalculator client:load locale={locale} />
+  ) : tier === 'standard' ? (
+    <StandardCalculator client:load slug={slug} locale={locale} />
+  ) : null
+}

@@ -2,6 +2,7 @@
  * schema.org JSON-LD builders for medical pages.
  * https://schema.org/MedicalWebPage, https://schema.org/MedicalRiskCalculator
  */
+import type { Citation } from '../calculators/types';
 
 interface MedicalWebPageInput {
   url: string;
@@ -26,9 +27,24 @@ export function medicalWebPage(input: MedicalWebPageInput) {
   };
 }
 
+function citationToSchema(c: Citation) {
+  return {
+    '@type': 'ScholarlyArticle',
+    name: c.title,
+    ...(c.authors ? { author: c.authors } : {}),
+    ...(c.journal ? { isPartOf: { '@type': 'Periodical', name: c.journal } } : {}),
+    datePublished: String(c.year),
+    ...(c.doi ? { sameAs: `https://doi.org/${c.doi}` } : c.url ? { sameAs: c.url } : {}),
+  };
+}
+
 interface MedicalRiskCalculatorInput extends MedicalWebPageInput {
   /** Condition the calculator estimates risk for, e.g. "Coronary artery disease". */
   estimatesRiskOf: string;
+  citations?: Citation[];
+  version?: string;
+  /** ISO date of the last physician review, if any. */
+  lastReviewed?: string;
 }
 
 export function medicalRiskCalculator(input: MedicalRiskCalculatorInput) {
@@ -43,6 +59,11 @@ export function medicalRiskCalculator(input: MedicalRiskCalculatorInput) {
       '@type': 'MedicalCondition',
       name: input.estimatesRiskOf,
     },
+    ...(input.version ? { version: input.version } : {}),
+    ...(input.lastReviewed ? { lastReviewed: input.lastReviewed } : {}),
+    ...(input.citations && input.citations.length
+      ? { citation: input.citations.map(citationToSchema) }
+      : {}),
   };
 }
 

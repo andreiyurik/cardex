@@ -31,15 +31,34 @@ Frontend-first: all computation runs in the browser; no backend at MVP stage.
   `src/lib/calculators/` as pure, typed, fully Vitest-covered functions.
   This is the single source of truth. Islands only render UI and call
   these functions — they NEVER duplicate formulas in markup.
-- Each calculator = (1) pure calculation function + tests,
-  (2) static Astro page for SEO, (3) Svelte island for interactivity.
+- **A calculator is a typed data object** (`CalculatorDefinition` in
+  `src/lib/calculators/types.ts`): pure `compute`, interpretation `bands`,
+  `provenance`, optional declarative `inputs` (with units + ranges), and
+  `goldenCases`. Register it in `registry.ts`; pages, the home catalog,
+  the sitemap and tests derive from it. Adding a calculator needs **no new
+  page files** (one dynamic route per locale enumerates the registry).
+- **Two tiers.** Standard calculators are form-driven and rendered by ONE
+  generic engine (`StandardCalculator.svelte`) — reference:
+  Cockcroft–Gault. Signature calculators get a bespoke island — reference:
+  SYNTAX (`SyntaxCalculator.svelte`). `CalculatorHost.astro` dispatches.
+  Put design effort into signature islands; keep standard ones data-only.
+- **Trust layer is first-class.** `Provenance` (source citations + DOI,
+  formula `version`, `status` draft/physician-verified, `reviewedBy`) is
+  rendered server-side (`Provenance.astro`) and emitted to schema.org.
+  `GoldenCase[]` (published reference results) run in a generic test
+  harness (`golden.test.ts`) and are the physician sign-off artifact.
+  Units/ranges live in the input schema; the engine validates and converts.
 - Design tokens (colors, typography, spacing) are defined once in
   `src/styles/global.css` (Tailwind `@theme` + DaisyUI theme) and shared
-  by all pages and islands. Dark, clean, premium clinical aesthetic;
-  a single accent color.
-- Clinical coefficients that have not been verified by a practicing
-  physician MUST be marked with `TODO(clinical): verify with practicing
-  physician` and listed in `docs/roadmap.md`. Never invent medical numbers.
+  by all pages and islands. `severity.ts` maps clinical severity → token
+  classes. Dark, clean, premium clinical aesthetic; a single accent color.
+- Clinical coefficients not verified by a practicing physician MUST be
+  marked `TODO(clinical): verify with practicing physician`, listed in
+  `docs/roadmap.md`, and kept `provenance.status: 'draft'`. Never invent
+  medical numbers.
+- Frontend-only guarantees: calculations run in the browser (no patient
+  data leaves the device); state is mirrored to the URL (shareable); a
+  service worker (`public/sw.js`) makes the site work offline.
 
 ## SEO
 
@@ -51,13 +70,23 @@ Frontend-first: all computation runs in the browser; no backend at MVP stage.
 
 ## Project structure
 
-- `src/lib/calculators/` — clinical logic (pure TS + tests)
-- `src/lib/seo/` — schema.org helpers
-- `src/i18n/` — locale dictionaries and helpers
-- `src/components/islands/` — Svelte islands
-- `src/components/` — Astro components (Seo, header, footer)
-- `src/layouts/` — BaseLayout (shell + SEO + header/footer)
-- `src/pages/` — ru pages at root, en pages under `en/`
+- `src/lib/calculators/` — clinical logic + framework
+  - `types.ts` — `CalculatorDefinition`, provenance, bands, input schema,
+    golden cases, `bandFor`
+  - `<name>.ts` — one calculator (pure compute + definition + golden cases)
+  - `registry.ts` — the list everything derives from
+  - `*.test.ts` — per-calculator tests + generic `golden.test.ts` harness
+- `src/lib/seo/` — schema.org helpers (citations, version, lastReviewed)
+- `src/i18n/` — locale dictionaries and helpers (`ru` canonical, `en` typed)
+- `src/components/islands/` — Svelte islands (`StandardCalculator` generic
+  engine, signature islands like `SyntaxCalculator`, `severity.ts`,
+  `url-state.ts`)
+- `src/components/` — Astro components (Seo, Provenance, CalculatorHost,
+  HomeContent, header, footer)
+- `src/layouts/` — BaseLayout (shell + SEO + PWA + header/footer)
+- `src/pages/` — ru at root, en under `en/`; calculators via the
+  registry-driven `calculators/[slug].astro` route
+- `public/` — `manifest.webmanifest`, `sw.js`, `robots.txt`
 - `docs/` — architecture, ADRs, roadmap
 
 ## Development

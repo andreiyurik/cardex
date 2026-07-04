@@ -1,6 +1,7 @@
 ---
 import { Activity } from '@lucide/astro';
 import { useTranslations, localePath, type Locale } from '../i18n';
+import { calculators } from '../lib/calculators/registry';
 
 interface Props {
   locale: Locale;
@@ -11,6 +12,7 @@ interface Props {
 const { locale, path } = Astro.props;
 const t = useTranslations(locale);
 const otherLocale: Locale = locale === 'ru' ? 'en' : 'ru';
+const firstCalculator = `/calculators/${calculators[0].slug}`;
 ---
 
 <header class="border-base-300 flex items-center justify-between border-b py-4">
@@ -21,7 +23,7 @@ const otherLocale: Locale = locale === 'ru' ? 'en' : 'ru';
   <nav class="flex items-center gap-1">
     <a href={localePath(locale, '/')} class="btn btn-ghost btn-sm">{t.nav.home}</a>
     <a
-      href={localePath(locale, '/calculators/syntax')}
+      href={localePath(locale, firstCalculator)}
       class="btn btn-ghost btn-sm">{t.nav.calculators}</a
     >
     <a

@@ -29,7 +29,27 @@ const { title, description, locale, path, jsonLd } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- PWA / offline -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#0b0f14" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Cardex" />
+
     <Seo {title} {description} {locale} {path} {jsonLd} />
+
+    {/* Register the service worker in production only (avoids stale caches in dev). */}
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        const host = location.hostname;
+        if (host !== 'localhost' && host !== '127.0.0.1') {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+          });
+        }
+      }
+    </script>
   </head>
   <body class="bg-base-100 text-base-content min-h-dvh font-sans antialiased">
     <div class="mx-auto flex min-h-dvh max-w-5xl flex-col px-4">

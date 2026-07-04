@@ -1,43 +1,50 @@
 <script lang="ts">
   /**
-   * SYNTAX Score island — interactive coronary segment picker.
-   * Renders UI only; all scoring comes from src/lib/calculators/syntax.ts.
+   * SYNTAX Score island (signature tier) — interactive coronary segment
+   * picker. Renders UI only; all scoring comes from the pure functions in
+   * src/lib/calculators/syntax.ts. Bands, labels and provenance come from
+   * the definition + i18n dictionaries.
    */
   import {
     applicableSegments,
     calculateSyntaxScore,
+    syntaxDefinition,
     type Dominance,
     type LesionInput,
     type SegmentId,
   } from '../../lib/calculators/syntax';
+  import { bandFor } from '../../lib/calculators/types';
+  import { useTranslations, type Locale } from '../../i18n';
+  import { severityText, severityBorder } from './severity';
+  import { readParams, writeParams, copyCurrentUrl } from './url-state';
   import { CoronaryTree } from './syntax-tree';
 
-  interface Props {
-    // Localized strings passed from the Astro page (no hardcoded UI text).
-    t: {
-      dominance: string;
-      dominanceRight: string;
-      dominanceLeft: string;
-      treeHint: string;
-      selectedLesions: string;
-      noLesions: string;
-      totalOcclusion: string;
-      remove: string;
-      reset: string;
-      score: string;
-      riskLabel: string;
-      risk: { low: string; intermediate: string; high: string };
-      unverifiedBadge: string;
-      unverifiedNote: string;
-      segments: Record<SegmentId, string>;
-    };
+  let { locale }: { locale: Locale } = $props();
+
+  const t = useTranslations(locale);
+  const ts = t.syntaxCalc;
+  const bandsText = t.calculators.syntax.bands;
+
+  function initialState(): { dominance: Dominance; lesions: Map<SegmentId, LesionInput> } {
+    const params = readParams();
+    const dominance: Dominance = params.get('d') === 'left' ? 'left' : 'right';
+    const lesions = new Map<SegmentId, LesionInput>();
+    const raw = params.get('l');
+    if (raw) {
+      for (const token of raw.split(',')) {
+        const totalOcclusion = token.endsWith('!');
+        const id = (totalOcclusion ? token.slice(0, -1) : token) as SegmentId;
+        if (CoronaryTree.some((s) => s.id === id)) {
+          lesions.set(id, { segmentId: id, totalOcclusion });
+        }
+      }
+    }
+    return { dominance, lesions };
   }
 
-  let { t }: Props = $props();
-
-  let dominance = $state<Dominance>('right');
-  // Map segment id → lesion (presence = marked). totalOcclusion toggled per lesion.
-  let lesions = $state<Map<SegmentId, LesionInput>>(new Map());
+  const init = initialState();
+  let dominance = $state<Dominance>(init.dominance);
+  let lesions = $state<Map<SegmentId, LesionInput>>(init.lesions);
 
   const available = $derived(new Set(applicableSegments(dominance)));
 
@@ -48,17 +55,22 @@
     }),
   );
 
-  const riskClass = $derived(
-    result.risk === 'low'
-      ? 'text-success'
-      : result.risk === 'intermediate'
-        ? 'text-warning'
-        : 'text-error',
-  );
-
+  const band = $derived(bandFor(result.score, syntaxDefinition.bands));
   const selectedList = $derived(
     [...lesions.values()].filter((l) => available.has(l.segmentId)),
   );
+
+  const isDraft = syntaxDefinition.provenance.status === 'draft';
+
+  $effect(() => {
+    const params = new URLSearchParams();
+    if (dominance !== 'right') params.set('d', dominance);
+    const active = selectedList
+      .map((l) => `${l.segmentId}${l.totalOcclusion ? '!' : ''}`)
+      .join(',');
+    if (active) params.set('l', active);
+    writeParams(params);
+  });
 
   function toggleSegment(id: SegmentId) {
     if (!available.has(id)) return;
@@ -80,8 +92,10 @@
     lesions = new Map();
   }
 
-  function setDominance(d: Dominance) {
-    dominance = d;
+  let copied = $state(false);
+  async function share() {
+    copied = await copyCurrentUrl();
+    if (copied) setTimeout(() => (copied = false), 2000);
   }
 </script>
 
@@ -92,14 +106,14 @@
       <div class="join">
         <button
           class="btn btn-sm join-item {dominance === 'right' ? 'btn-primary' : 'btn-ghost'}"
-          onclick={() => setDominance('right')}>{t.dominanceRight}</button
+          onclick={() => (dominance = 'right')}>{ts.dominanceRight}</button
         >
         <button
           class="btn btn-sm join-item {dominance === 'left' ? 'btn-primary' : 'btn-ghost'}"
-          onclick={() => setDominance('left')}>{t.dominanceLeft}</button
+          onclick={() => (dominance = 'left')}>{ts.dominanceLeft}</button
         >
       </div>
-      <span class="text-base-content/50 text-xs">{t.treeHint}</span>
+      <span class="text-base-content/50 text-xs">{ts.treeHint}</span>
     </div>
 
     <svg
@@ -119,7 +133,7 @@
           role="button"
           tabindex={isAvailable ? 0 : -1}
           aria-pressed={isMarked}
-          aria-label={t.segments[seg.id]}
+          aria-label={ts.segments[seg.id]}
         >
           <line
             x1={seg.x1}
@@ -156,41 +170,49 @@
 
   <!-- Result + selected lesions -->
   <div class="space-y-4">
-    <div class="bg-base-200 border-base-300 rounded-box border p-4 text-center">
+    <div class="bg-base-200 rounded-box border p-4 text-center {severityBorder(band.severity)}">
       <div class="text-base-content/60 text-xs uppercase tracking-wide">
-        {t.score}
+        {t.calculators.syntax.title}
       </div>
       <div class="text-primary my-1 text-5xl font-bold tabular-nums">
         {result.score}
       </div>
       <div class="text-sm">
-        <span class="text-base-content/60">{t.riskLabel}: </span>
-        <span class="font-semibold {riskClass}">{t.risk[result.risk]}</span>
+        <span class="text-base-content/60">{t.calc.category}: </span>
+        <span class="font-semibold {severityText(band.severity)}">{bandsText[band.id as 'low' | 'intermediate' | 'high'].label}</span>
       </div>
+      <p class="text-base-content/60 mt-2 text-xs leading-snug">
+        {bandsText[band.id as 'low' | 'intermediate' | 'high'].summary}
+      </p>
     </div>
 
-    <div
-      class="border-warning/40 bg-warning/10 text-warning rounded-box border p-3 text-xs"
-    >
-      <div class="mb-1 font-semibold">⚠ {t.unverifiedBadge}</div>
-      <p class="text-warning/80 leading-snug">{t.unverifiedNote}</p>
-    </div>
+    {#if isDraft}
+      <div class="border-warning/40 bg-warning/10 text-warning rounded-box border p-3 text-xs">
+        <div class="mb-1 font-semibold">⚠ {t.calc.notForClinicalUse}</div>
+        <p class="text-warning/80 leading-snug">{t.calc.unverifiedNote}</p>
+      </div>
+    {/if}
 
     <div class="bg-base-200 border-base-300 rounded-box border p-4">
       <div class="mb-2 flex items-center justify-between">
-        <span class="text-sm font-semibold">{t.selectedLesions}</span>
-        {#if selectedList.length > 0}
-          <button class="btn btn-ghost btn-xs" onclick={reset}>{t.reset}</button>
-        {/if}
+        <span class="text-sm font-semibold">{ts.selectedLesions}</span>
+        <div class="flex gap-1">
+          <button class="btn btn-ghost btn-xs" onclick={share}>
+            {copied ? t.calc.shared : t.calc.share}
+          </button>
+          {#if selectedList.length > 0}
+            <button class="btn btn-ghost btn-xs" onclick={reset}>{t.calc.reset}</button>
+          {/if}
+        </div>
       </div>
       {#if selectedList.length === 0}
-        <p class="text-base-content/50 text-sm">{t.noLesions}</p>
+        <p class="text-base-content/50 text-sm">{ts.noLesions}</p>
       {:else}
         <ul class="space-y-2">
           {#each selectedList as lesion (lesion.segmentId)}
             <li class="flex items-center justify-between gap-2 text-sm">
-              <span class="min-w-0 flex-1 truncate" title={t.segments[lesion.segmentId]}>
-                {t.segments[lesion.segmentId]}
+              <span class="min-w-0 flex-1 truncate" title={ts.segments[lesion.segmentId]}>
+                {ts.segments[lesion.segmentId]}
               </span>
               <label class="flex shrink-0 items-center gap-1 text-xs">
                 <input
@@ -199,11 +221,11 @@
                   checked={lesion.totalOcclusion}
                   onchange={() => toggleOcclusion(lesion.segmentId)}
                 />
-                {t.totalOcclusion}
+                {ts.totalOcclusion}
               </label>
               <button
                 class="btn btn-ghost btn-xs"
-                aria-label={t.remove}
+                aria-label={ts.remove}
                 onclick={() => toggleSegment(lesion.segmentId)}>✕</button
               >
             </li>
