@@ -17,7 +17,7 @@
   import { useTranslations, type Locale } from '../../i18n';
   import { severityText, severityBorder } from './severity';
   import { readParams, writeParams, copyCurrentUrl } from './url-state';
-  import { CoronaryTree } from './syntax-tree';
+  import { CoronaryTree, HEART_SILHOUETTE } from './syntax-tree';
 
   let { locale }: { locale: Locale } = $props();
 
@@ -118,17 +118,44 @@
     </div>
 
     <svg
-      viewBox="0 0 400 320"
+      viewBox="0 28 400 286"
       class="h-auto w-full select-none"
       role="group"
       aria-label="Coronary segment diagram"
     >
+      <defs>
+        <radialGradient id="heartFill" cx="46%" cy="36%" r="72%">
+          <stop offset="0%" stop-color="var(--color-base-300)" stop-opacity="0.7" />
+          <stop offset="100%" stop-color="var(--color-base-300)" stop-opacity="0.18" />
+        </radialGradient>
+        <linearGradient id="vessel" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--color-base-content)" stop-opacity="0.44" />
+          <stop offset="100%" stop-color="var(--color-base-content)" stop-opacity="0.22" />
+        </linearGradient>
+        <filter id="lesionGlow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="3.2" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- Myocardium silhouette behind the vessels (decorative). -->
+      <path
+        d={HEART_SILHOUETTE}
+        fill="url(#heartFill)"
+        stroke="var(--color-base-300)"
+        stroke-width="1.5"
+        stroke-opacity="0.6"
+      />
+
       {#each CoronaryTree as seg (seg.id)}
         {@const isAvailable = available.has(seg.id)}
         {@const lesion = lesions.get(seg.id)}
         {@const isMarked = isAvailable && !!lesion}
         <g
-          class={isAvailable ? 'cursor-pointer' : 'pointer-events-none opacity-20'}
+          class={isAvailable ? 'cursor-pointer' : 'pointer-events-none opacity-15'}
           onclick={() => toggleSegment(seg.id)}
           onkeydown={(e) => e.key === 'Enter' && toggleSegment(seg.id)}
           role="button"
@@ -137,40 +164,35 @@
           aria-label={ts.segments[seg.id]}
         >
           <!-- Invisible fat hit area for comfortable thumb tapping on mobile. -->
-          <line
-            x1={seg.x1}
-            y1={seg.y1}
-            x2={seg.x2}
-            y2={seg.y2}
-            stroke="transparent"
-            stroke-width="30"
+          <path d={seg.d} fill="none" stroke="transparent" stroke-width="28" stroke-linecap="round" />
+          <!-- Vessel: tapered, curved; gradient when idle, colored + glow when marked. -->
+          <path
+            d={seg.d}
+            fill="none"
             stroke-linecap="round"
-          />
-          <line
-            x1={seg.x1}
-            y1={seg.y1}
-            x2={seg.x2}
-            y2={seg.y2}
-            stroke-width={isMarked ? 9 : 7}
-            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width={isMarked ? seg.width + 1.5 : seg.width}
+            stroke={isMarked ? undefined : 'url(#vessel)'}
+            filter={isMarked ? 'url(#lesionGlow)' : undefined}
             class={isMarked
               ? lesion?.totalOcclusion
                 ? 'stroke-error'
                 : 'stroke-warning'
-              : 'stroke-base-content/30 hover:stroke-primary/60'}
+              : 'transition-[stroke] hover:stroke-primary/70'}
           />
           <circle
-            cx={(seg.x1 + seg.x2) / 2}
-            cy={(seg.y1 + seg.y2) / 2}
-            r="13"
-            class={isMarked ? 'fill-base-100' : 'fill-transparent'}
+            cx={seg.lx}
+            cy={seg.ly}
+            r="9.5"
+            class={isMarked ? 'fill-base-100 stroke-base-content/20' : 'fill-base-200/90 stroke-base-content/15'}
+            stroke-width="1"
           />
           <text
-            x={(seg.x1 + seg.x2) / 2}
-            y={(seg.y1 + seg.y2) / 2}
+            x={seg.lx}
+            y={seg.ly}
             text-anchor="middle"
             dominant-baseline="central"
-            class="fill-base-content pointer-events-none text-[11px] font-semibold"
+            class="fill-base-content pointer-events-none text-[10px] font-semibold"
           >
             {seg.label}
           </text>
