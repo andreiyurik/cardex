@@ -8,8 +8,8 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
-  // TODO: replace with the production domain once connected in Cloudflare
-  site: 'https://cardex.pages.dev',
+  // Cloudflare Workers free subdomain (worker "cardex" on subdomain "cardex").
+  site: 'https://cardex.cardex.workers.dev',
 
   i18n: {
     defaultLocale: 'ru',

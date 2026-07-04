@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /review
 
-Sitemap: https://cardex.pages.dev/sitemap-index.xml
+Sitemap: https://cardex.cardex.workers.dev/sitemap-index.xml
