@@ -1,4 +1,5 @@
 /** Site-wide constants. */
 
-// TODO(product): replace with the real support/contact address before deploy.
-export const CONTACT_EMAIL = 'hello@cardex.app';
+/** Contact link for reaching the author (shown in footer + disclaimer). */
+export const CONTACT_TELEGRAM = 'https://t.me/industrialprofi';
+export const CONTACT_TELEGRAM_HANDLE = '@industrialprofi';

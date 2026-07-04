@@ -1,6 +1,6 @@
 ---
 import { useTranslations, type Locale } from '../i18n';
-import { CONTACT_EMAIL } from '../lib/site';
+import { CONTACT_TELEGRAM, CONTACT_TELEGRAM_HANDLE } from '../lib/site';
 
 interface Props {
   locale: Locale;
@@ -18,8 +18,13 @@ const d = t.disclaimer;
   <p class="text-base-content/70 leading-relaxed">{d.p4}</p>
   <p class="text-base-content/70 leading-relaxed">
     {d.p5}
-    <a href={`mailto:${CONTACT_EMAIL}`} class="text-primary underline underline-offset-2">
-      {CONTACT_EMAIL}
+    <a
+      href={CONTACT_TELEGRAM}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-primary underline underline-offset-2"
+    >
+      Telegram {CONTACT_TELEGRAM_HANDLE}
     </a>
   </p>
 </article>

@@ -1,6 +1,6 @@
 ---
 import { useTranslations, localePath, type Locale } from '../i18n';
-import { CONTACT_EMAIL } from '../lib/site';
+import { CONTACT_TELEGRAM } from '../lib/site';
 
 interface Props {
   locale: Locale;
@@ -18,7 +18,12 @@ const t = useTranslations(locale);
     <a href={localePath(locale, '/disclaimer')} class="text-base-content/70 hover:text-primary">
       {t.footer.legal}
     </a>
-    <a href={`mailto:${CONTACT_EMAIL}`} class="text-base-content/70 hover:text-primary">
+    <a
+      href={CONTACT_TELEGRAM}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-base-content/70 hover:text-primary"
+    >
       {t.footer.contact}
     </a>
   </nav>
