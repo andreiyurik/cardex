@@ -4,6 +4,14 @@ dist/
 # generated types
 .astro/
 
+# Cloudflare / Wrangler local state (miniflare caches, KV, images)
+.wrangler/
+.dev.vars
+.dev.vars.*
+
+# local tooling artifacts (e.g. downloaded headless browser for screenshots)
+/chrome/
+
 # dependencies
 node_modules/
 
