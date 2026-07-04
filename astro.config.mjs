@@ -8,8 +8,8 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
-  // Cloudflare Workers free subdomain (worker "cardex" on subdomain "cardex").
-  site: 'https://cardex.cardex.workers.dev',
+  // Cloudflare Workers free subdomain (worker "cardex" on subdomain "pavelk").
+  site: 'https://cardex.pavelk.workers.dev',
 
   i18n: {
     defaultLocale: 'ru',
