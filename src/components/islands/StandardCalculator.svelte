@@ -110,53 +110,68 @@
   function unitLabel(id: string): string {
     return (t.units as Record<string, string>)[id] ?? id;
   }
+
+  function contribLabel(c: { labelKey?: string; label?: string; detail?: string }): string {
+    const base =
+      (c.labelKey && tc.fields?.[c.labelKey]) ?? c.label ?? c.labelKey ?? '';
+    return c.detail ? `${base} (${c.detail})` : base;
+  }
 </script>
 
 <div class="grid gap-6 lg:grid-cols-[1fr_20rem]">
   <!-- Inputs -->
   <div class="bg-base-200 border-base-300 rounded-box space-y-4 border p-5">
     {#each fields as f (f.id)}
-      <div class="form-control">
-        <label class="label pb-1" for={`f-${f.id}`}>
+      {#if f.kind === 'boolean'}
+        <!-- Checklist row: label and toggle on one line (mobile-friendly). -->
+        <label
+          for={`f-${f.id}`}
+          class="border-base-300/50 flex cursor-pointer items-center justify-between gap-3 border-b py-1 last:border-b-0"
+        >
           <span class="label-text font-medium">{tc.fields[f.id]}</span>
-        </label>
-
-        {#if f.kind === 'number'}
-          <div class="join w-full">
-            <input
-              id={`f-${f.id}`}
-              type="number"
-              inputmode="decimal"
-              step={(f as NumberField).step ?? 'any'}
-              class="input input-bordered join-item w-full text-base"
-              bind:value={state[f.id].value}
-            />
-            {#if f.units && f.units.length > 1}
-              <select class="select select-bordered join-item text-base" bind:value={state[f.id].unit}>
-                {#each f.units as u (u.id)}
-                  <option value={u.id}>{unitLabel(u.id)}</option>
-                {/each}
-              </select>
-            {:else if f.units && f.units.length === 1}
-              <span class="btn btn-disabled join-item no-animation">{unitLabel(f.units[0].id)}</span>
-            {/if}
-          </div>
-        {:else if f.kind === 'select'}
-          <select id={`f-${f.id}`} class="select select-bordered w-full text-base" bind:value={state[f.id].value}>
-            {#each f.options as o (o.id)}
-              <option value={o.id}>{tc.options[o.id]}</option>
-            {/each}
-          </select>
-        {:else}
           <input
             id={`f-${f.id}`}
             type="checkbox"
-            class="toggle toggle-primary"
+            class="toggle toggle-primary shrink-0"
             checked={state[f.id].value === 'true'}
             onchange={(e) => (state[f.id].value = e.currentTarget.checked ? 'true' : 'false')}
           />
-        {/if}
-      </div>
+        </label>
+      {:else}
+        <div class="form-control">
+          <label class="label pb-1" for={`f-${f.id}`}>
+            <span class="label-text font-medium">{tc.fields[f.id]}</span>
+          </label>
+
+          {#if f.kind === 'number'}
+            <div class="join w-full">
+              <input
+                id={`f-${f.id}`}
+                type="number"
+                inputmode="decimal"
+                step={(f as NumberField).step ?? 'any'}
+                class="input input-bordered join-item w-full text-base"
+                bind:value={state[f.id].value}
+              />
+              {#if f.units && f.units.length > 1}
+                <select class="select select-bordered join-item text-base" bind:value={state[f.id].unit}>
+                  {#each f.units as u (u.id)}
+                    <option value={u.id}>{unitLabel(u.id)}</option>
+                  {/each}
+                </select>
+              {:else if f.units && f.units.length === 1}
+                <span class="btn btn-disabled join-item no-animation">{unitLabel(f.units[0].id)}</span>
+              {/if}
+            </div>
+          {:else}
+            <select id={`f-${f.id}`} class="select select-bordered w-full text-base" bind:value={state[f.id].value}>
+              {#each f.options as o (o.id)}
+                <option value={o.id}>{tc.options[o.id]}</option>
+              {/each}
+            </select>
+          {/if}
+        </div>
+      {/if}
     {/each}
 
     <div class="flex gap-2 pt-2">
@@ -194,6 +209,20 @@
       <div class="border-warning/40 bg-warning/10 text-warning rounded-box border p-3 text-xs">
         <div class="mb-1 font-semibold">⚠ {t.calc.notForClinicalUse}</div>
         <p class="text-warning/80 leading-snug">{t.calc.unverifiedNote}</p>
+      </div>
+    {/if}
+
+    {#if result && result.contributions.length > 0}
+      <div class="bg-base-200 border-base-300 rounded-box border p-4">
+        <div class="mb-2 text-sm font-semibold">{t.calc.explanation}</div>
+        <ul class="space-y-1 text-sm">
+          {#each result.contributions as c (c.labelKey ?? c.label)}
+            <li class="flex items-center justify-between gap-2">
+              <span class="text-base-content/70 min-w-0 flex-1">{contribLabel(c)}</span>
+              <span class="font-semibold tabular-nums">+{c.value}</span>
+            </li>
+          {/each}
+        </ul>
       </div>
     {/if}
 

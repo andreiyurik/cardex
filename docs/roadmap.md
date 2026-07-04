@@ -26,15 +26,26 @@
 - [x] URL-encoded shareable state
 - [ ] **Clinical verification by practicing physician** (see below)
 
-## Phase 2 — Risk calculators
+## Phase 2 — Risk calculators (pre-deploy set)
 
-- GRACE 2.0 (ACS risk)
-- Mehran (contrast-induced nephropathy)
-- PRECISE-DAPT (bleeding on DAPT)
+Added (standard tier, pending physician sign-off):
 
-Each is added as a `CalculatorDefinition` (mostly standard tier). Clinical
-constants enter the codebase only from primary sources, verified by the
-physician co-founder, with golden cases from published references.
+- [x] CHA₂DS₂-VASc (stroke risk in AF) — canonical point table, golden
+      cases `verified`; `draft` pending band-threshold wording sign-off.
+- [x] HAS-BLED (bleeding on anticoagulation) — canonical point table,
+      golden cases `verified`; `draft` pending sign-off.
+- [x] Mehran (CI-AKI after PCI) — structure + mechanics; **weights are
+      placeholders**, golden cases `placeholder`, `draft`.
+- [x] GRACE (ACS mortality) — structure + mechanics; **point tables and
+      band thresholds are placeholders**, golden cases `placeholder`,
+      `draft`. Replace with the real GRACE / GRACE 2.0 mapping.
+
+Still to add: PRECISE-DAPT / DAPT score, CRUSADE, eGFR (CKD-EPI 2021),
+max contrast dose / contrast-to-clearance ratio, EuroSCORE II.
+
+Each is a `CalculatorDefinition` (standard tier). Clinical constants enter
+the codebase only from primary sources, verified by the physician
+co-founder, with golden cases from published references.
 
 ## Phase 3 — Report generator
 
@@ -77,7 +88,29 @@ Every item is also marked in code with `TODO(clinical)`.
    and published, but confirm the transcription and the CrCl band
    thresholds/wording before marking `physician-verified`.
 
+### CHA₂DS₂-VASc
+8. **OAC thresholds / band wording**: confirm the sex-dependent
+   anticoagulation thresholds and band summaries; the point table itself
+   is canonical.
+
+### HAS-BLED
+9. **Factor definitions + high-risk threshold**: confirm definitions
+   (e.g. uncontrolled hypertension SBP > 160) and the ≥3 threshold; the
+   one-point-per-factor table is canonical.
+
+### Mehran (`mehran.ts` → `WEIGHTS`, `MEHRAN_BANDS`)
+10. **Factor weights and band thresholds are PLACEHOLDERS**: verify the
+    published weights (hypotension/IABP/CHF, age > 75, anemia, diabetes,
+    renal categories, contrast per 100 mL) and risk bands; replace the
+    `placeholder` golden cases with published reference cases.
+
+### GRACE (`grace.ts` → point tables, `GRACE_BANDS`)
+11. **Point tables and band thresholds are PLACEHOLDERS** (round numbers,
+    not real GRACE values): transcribe the real GRACE / GRACE 2.0 mapping
+    and thresholds from the primary source; replace the `placeholder`
+    golden cases. Only the input structure and additive mechanics are real.
+
 ### General
-8. **Disclaimer + band summary text** (ru/en): review medico-legal wording.
-9. Set `provenance.reviewedBy` and flip `status` to `physician-verified`
-   per calculator once the co-founder signs off.
+12. **Disclaimer + band summary text** (ru/en): review medico-legal wording.
+13. Set `provenance.reviewedBy` and flip `status` to `physician-verified`
+    per calculator once the co-founder signs off.

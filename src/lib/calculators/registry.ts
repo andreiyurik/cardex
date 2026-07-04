@@ -5,10 +5,18 @@
  */
 import type { CalculatorDefinition } from './types';
 import { syntaxDefinition } from './syntax';
+import { cha2ds2VascDefinition } from './cha2ds2-vasc';
+import { hasBledDefinition } from './has-bled';
+import { graceDefinition } from './grace';
+import { mehranDefinition } from './mehran';
 import { creatinineClearanceDefinition } from './creatinine-clearance';
 
 export const calculators: CalculatorDefinition[] = [
   syntaxDefinition,
+  cha2ds2VascDefinition,
+  hasBledDefinition,
+  graceDefinition,
+  mehranDefinition,
   creatinineClearanceDefinition,
 ];
 

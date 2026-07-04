@@ -136,6 +136,132 @@ export const en: Dictionary = {
         },
       },
     },
+    cha2ds2vasc: {
+      title: 'CHA₂DS₂-VASc',
+      shortDescription: 'Stroke risk in atrial fibrillation',
+      seoTitle: 'CHA₂DS₂-VASc Stroke Risk Calculator | Cardex',
+      seoDescription:
+        'CHA₂DS₂-VASc calculator: estimate stroke and thromboembolism risk in ' +
+        'non-valvular atrial fibrillation to guide anticoagulation.',
+      intro:
+        'CHA₂DS₂-VASc estimates the risk of stroke and systemic ' +
+        'thromboembolism in non-valvular atrial fibrillation and guides the ' +
+        'decision on anticoagulation.',
+      fields: {
+        age: 'Age (years)',
+        sex: 'Sex',
+        chf: 'CHF / LV dysfunction',
+        hypertension: 'Hypertension',
+        diabetes: 'Diabetes mellitus',
+        stroke: 'Stroke / TIA / thromboembolism',
+        vascular: 'Vascular disease',
+      },
+      options: { male: 'Male', female: 'Female' },
+      bands: {
+        low: { label: 'Low (0)', summary: 'Low risk. Anticoagulation usually not required.' },
+        intermediate: { label: 'Intermediate (1)', summary: 'Intermediate risk. Consider anticoagulation.' },
+        high: { label: 'High (≥ 2)', summary: 'High risk. Anticoagulation generally indicated.' },
+      },
+    },
+    hasbled: {
+      title: 'HAS-BLED',
+      shortDescription: 'Bleeding risk on anticoagulation',
+      seoTitle: 'HAS-BLED Bleeding Risk Calculator | Cardex',
+      seoDescription:
+        'HAS-BLED calculator: estimate major bleeding risk on anticoagulation ' +
+        'in patients with atrial fibrillation.',
+      intro:
+        'HAS-BLED estimates major bleeding risk on anticoagulation in atrial ' +
+        'fibrillation. A high score is a prompt to correct modifiable factors, ' +
+        'not to withhold anticoagulation.',
+      fields: {
+        hypertension: 'Hypertension (SBP > 160)',
+        renal: 'Abnormal renal function',
+        liver: 'Abnormal liver function',
+        stroke: 'Prior stroke',
+        bleeding: 'Bleeding history / predisposition',
+        labileInr: 'Labile INR',
+        elderly: 'Age > 65',
+        drugs: 'Drugs (antiplatelet / NSAID)',
+        alcohol: 'Alcohol excess',
+      },
+      bands: {
+        low: { label: 'Low (0–2)', summary: 'Low bleeding risk.' },
+        high: { label: 'High (≥ 3)', summary: 'High risk. Manage modifiable factors.' },
+      },
+    },
+    grace: {
+      title: 'GRACE',
+      shortDescription: 'Mortality risk in acute coronary syndrome',
+      seoTitle: 'GRACE ACS Risk Calculator | Cardex',
+      seoDescription:
+        'GRACE calculator: risk stratification of mortality in acute coronary ' +
+        'syndrome from clinical variables at admission.',
+      intro:
+        'GRACE stratifies the risk of death in acute coronary syndrome from ' +
+        'variables at admission and helps guide the management strategy.',
+      notes:
+        'The point tables are placeholders pending transcription and ' +
+        'verification of the original GRACE algorithm by a practicing physician.',
+      fields: {
+        age: 'Age (years)',
+        heartRate: 'Heart rate (bpm)',
+        systolicBp: 'Systolic BP (mmHg)',
+        creatinine: 'Serum creatinine',
+        killip: 'Killip class',
+        cardiacArrest: 'Cardiac arrest at admission',
+        stDeviation: 'ST-segment deviation',
+        elevatedMarkers: 'Elevated cardiac markers',
+      },
+      options: {
+        killipI: 'I (no HF)',
+        killipII: 'II (rales / S3)',
+        killipIII: 'III (pulmonary edema)',
+        killipIV: 'IV (cardiogenic shock)',
+      },
+      bands: {
+        low: { label: 'Low', summary: 'Low risk. Thresholds are placeholders pending verification.' },
+        intermediate: { label: 'Intermediate', summary: 'Intermediate risk. Thresholds pending verification.' },
+        high: { label: 'High', summary: 'High risk. Thresholds pending verification.' },
+      },
+    },
+    mehran: {
+      title: 'Mehran score',
+      shortDescription: 'Contrast-induced nephropathy risk after PCI',
+      seoTitle: 'Mehran Score — CI-AKI Risk After PCI | Cardex',
+      seoDescription:
+        'Mehran score calculator: risk of contrast-induced acute kidney injury ' +
+        '(CI-AKI) after percutaneous coronary intervention.',
+      intro:
+        'The Mehran score estimates the risk of contrast-induced acute kidney ' +
+        'injury (CI-AKI) after PCI. It pairs well with the creatinine clearance ' +
+        'calculator.',
+      notes:
+        'Factor weights are placeholders pending verification by a practicing ' +
+        'physician.',
+      fields: {
+        hypotension: 'Hypotension',
+        iabp: 'Intra-aortic balloon pump',
+        chf: 'Congestive heart failure',
+        ageOver75: 'Age > 75',
+        anemia: 'Anemia',
+        diabetes: 'Diabetes mellitus',
+        renal: 'Renal function (eGFR)',
+        contrastVolume: 'Contrast volume (mL)',
+      },
+      options: {
+        none: 'Normal (eGFR ≥ 60)',
+        'egfr40-60': 'eGFR 40–60',
+        'egfr20-40': 'eGFR 20–40',
+        'egfr<20': 'eGFR < 20',
+      },
+      bands: {
+        low: { label: 'Low (≤ 5)', summary: 'Low CI-AKI risk.' },
+        moderate: { label: 'Moderate (6–10)', summary: 'Moderate CI-AKI risk.' },
+        high: { label: 'High (11–15)', summary: 'High CI-AKI risk.' },
+        veryHigh: { label: 'Very high (≥ 16)', summary: 'Very high CI-AKI risk.' },
+      },
+    },
   },
   syntaxCalc: {
     dominance: 'Dominance',
