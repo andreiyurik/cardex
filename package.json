@@ -12,7 +12,8 @@
     "astro": "astro",
     "generate-types": "wrangler types",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.1.1",
