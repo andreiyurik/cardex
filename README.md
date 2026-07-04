@@ -1,2 +1,0 @@
-# cardex
-cardio app
