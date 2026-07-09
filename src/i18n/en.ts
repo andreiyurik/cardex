@@ -121,9 +121,12 @@ export const en: Dictionary = {
         '(PCI vs CABG). Mark diseased segments on the interactive diagram — ' +
         'the score and interpretation update automatically.',
       notes:
-        'Adverse lesion characteristics (bifurcation, calcification, ' +
-        'tortuosity, thrombus, chronic total occlusion details) are not yet ' +
-        'modeled.',
+        'The score follows the official SYNTAX Score I algorithm (Sianos, ' +
+        '2005): dominance-dependent segment weights, ×2 (stenosis 50–99%) ' +
+        'and ×5 (total occlusion) multipliers, plus adverse-morphology ' +
+        'adders. The Medina bifurcation grouping and several definitions ' +
+        'await confirmation by a practicing physician. Sub-segments (9a, ' +
+        '10a, 12a/b, 14a/b, 16a/b/c) are not yet modeled individually.',
       bands: {
         low: {
           label: 'Low (≤ 22)',
@@ -316,11 +319,46 @@ export const en: Dictionary = {
     dominance: 'Dominance',
     dominanceRight: 'Right dominant',
     dominanceLeft: 'Left dominant',
-    treeHint: 'Tap a segment to mark a lesion',
-    selectedLesions: 'Marked lesions',
-    noLesions: 'No segments marked',
-    totalOcclusion: 'Total occlusion',
+    treeHint: 'Tap a coronary segment to add a lesion',
+    treeHintActive: 'Tap an adjacent segment to include it in this lesion',
+    lesionsTitle: 'Lesions',
+    lesionLabel: 'Lesion',
+    noLesions: 'No lesions marked. Tap a segment on the diagram.',
+    addSegment: 'Add segment',
+    addSegmentActive: 'Pick a segment on the diagram…',
+    removeLesion: 'Remove lesion',
     remove: 'Remove',
+    severity: 'Severity',
+    stenosis: 'Stenosis 50–99%',
+    occlusion: 'Occlusion 100%',
+    characteristics: 'Lesion characteristics',
+    toTitle: 'Chronic total occlusion detail',
+    toAge: 'Age > 3 months or unknown',
+    toBluntStump: 'Blunt stump',
+    toBridging: 'Bridging collaterals',
+    toNonVisible: 'Non-visualised distal segments',
+    toNonVisibleHint: '+1 point per segment not filling with contrast',
+    toSideBranch: 'Side branch at occlusion (< 1.5 mm)',
+    bifurcation: 'Bifurcation',
+    bifIsBifurcation: 'Bifurcation lesion',
+    medinaProximal: 'Proximal main vessel',
+    medinaDistal: 'Distal main vessel',
+    medinaSide: 'Side branch ostium',
+    medinaHint: 'Medina classification — mark the diseased bifurcation segments',
+    angulation: 'Angulation between branches < 70°',
+    trifurcation: 'Trifurcation — number of diseased segments',
+    trifNone: 'None',
+    aortoOstial: 'Aorto-ostial lesion',
+    tortuosity: 'Severe tortuosity',
+    length: 'Lesion length > 20 mm',
+    calcification: 'Heavy calcification',
+    thrombus: 'Thrombus',
+    diffuse: 'Diffuse disease / small vessels',
+    diffuseHint: '+1 point per diseased segment',
+    points: 'pts',
+    baseLabel: 'base',
+    adverseLabel: 'morphology',
+    scoreBreakdown: 'Per-lesion breakdown',
     segments: {
       s1: 'RCA proximal',
       s2: 'RCA mid',
